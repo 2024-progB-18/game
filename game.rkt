@@ -4,16 +4,16 @@
 (require 2htdp/universe)
 
 ;;背景(外枠)スクリーンの定義
-(define SCENE-WIDTH 1024)
-(define SCENE-HEIGHT 576)
+(define SCENE-WIDTH 1920)
+(define SCENE-HEIGHT 1024)
 (define SCENE (empty-scene SCENE-WIDTH SCENE-HEIGHT "white"))
 
 ;;１マスの大きさ
-(define SQUARE 32)
+(define SQUARE 64)
 
 ;;ステージの大きさ
-(define STAGE-WIDTH 64)
-(define STAGE-HEIGHT 36)
+(define STAGE-WIDTH 30)
+(define STAGE-HEIGHT 16)
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
@@ -35,6 +35,7 @@
 (define sample-square (bitmap/file "sample-square.bmp"))
 (define sample-frame (bitmap/file "sample-frame.bmp"))
 (define sample-black (bitmap/file "sample-black.bmp"))
+(define frame64 (bitmap/file "frame64.bmp"))
 
 ;;ゲームスタート
 (define (start)
@@ -47,7 +48,7 @@
   (cond ((= (screen-type env) 0) start-screen)
         ((= (screen-type env) 1) selection-screen)
         ((= (screen-type env) 2) stage-screen)
-        ((= (screen-type env) 3) result-screen)
+;;        ((= (screen-type env) 3) result-screen)
         (else (error "wrong enviroment"))))
 
 ;;キーボード入力で発火
@@ -55,11 +56,17 @@
   (cond ((= (screen-type env) 0) (start-key-event env key))
         ((= (screen-type env) 1) (selection-key-event env key))
         ((= (screen-type env) 2) (stage-key-event env key))
-        ((= (screen-type env) 3) (result-key-event env key))
+;;        ((= (screen-type env) 3) (result-key-event env key))
         (else (error "wrong enviroment"))))
 
 (define start-screen
-  SCENE)
+  (place-image sample-frame
+               512
+               288
+               (place-image frame64
+                            512
+                            288
+                            SCENE)))
 
 (define (start-key-event env key)
   env)
@@ -76,8 +83,11 @@
 (define (stage-key-event env key)
   env)
 
-(define result-screen
+(define fail-screen
   SCENE)
 
-(define (result-key-event env key)
+(define success-screen
+  SCENE)
+
+(define (success-key-event env key)
   env)
