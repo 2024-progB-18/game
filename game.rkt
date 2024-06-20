@@ -38,10 +38,17 @@
 (define frame64 (bitmap/file "frame64.bmp"))
 
 ;;ゲームスタート
-(define (start)
-  (big-bang WORLD-ENVIROMENT
-            (to-draw display-contents)
-            (on-key key-action)))
+(define demo 'demo)
+(define (start . option)
+  (cond ((null? option)
+         (big-bang WORLD-ENVIROMENT
+                   (to-draw display-contents)
+                   (on-key key-action)))
+        ((= option demo)
+         (big-bang WORLD-ENVIROMENT
+                   (to-draw display-contents)
+                   (on-key key-action)))
+        (else (error "undefined option:" option))))
 
 ;;画面表示内容
 (define (display-contents env)
