@@ -48,7 +48,9 @@
   (cond ((= (screen-type env) 0) start-screen)
         ((= (screen-type env) 1) selection-screen)
         ((= (screen-type env) 2) stage-screen)
-;;        ((= (screen-type env) 3) result-screen)
+        ((= (screen-type env) 3) pause-screen)
+        ((= (screen-type env) 4) fail-screen)
+        ((= (screen-type env) 5) success-screen)
         (else (error "wrong enviroment"))))
 
 ;;キーボード入力で発火
@@ -56,9 +58,12 @@
   (cond ((= (screen-type env) 0) (start-key-event env key))
         ((= (screen-type env) 1) (selection-key-event env key))
         ((= (screen-type env) 2) (stage-key-event env key))
-;;        ((= (screen-type env) 3) (result-key-event env key))
+        ((= (screen-type env) 3) (pause-key-event env key))
+        ((= (screen-type env) 4) env)
+        ((= (screen-type env) 5) (success-key-event env key))
         (else (error "wrong enviroment"))))
 
+;;
 (define start-screen
   (place-image sample-frame
                512
@@ -71,21 +76,31 @@
 (define (start-key-event env key)
   env)
 
+;;
 (define selection-screen
   SCENE)
 
 (define (selection-key-event env key)
   env)
 
+;;
 (define stage-screen
   SCENE)
 
 (define (stage-key-event env key)
   env)
 
+(define pause-screen
+  SCENE)
+
+(define (pause-key-event env key)
+  env)
+
+;;
 (define fail-screen
   SCENE)
 
+;;
 (define success-screen
   SCENE)
 
