@@ -97,8 +97,15 @@
   SCENE)
 
 (define (selection-key-event env key);hayato
+  (define(decision-stage)
+   (cond
+       ((= select 1)(1st-stage))
+       ((= select 2)(2nd-stage))
+       ((= select 3)(3rd-stage))
+       ((= secect 4)(4th-stage))
+       ((= secect 5)(5th-stage))
+       ((= secect 6)(6th-stage))))
   env)
-
 ;;
 (define stage-screen
   SCENE)
