@@ -107,7 +107,7 @@
 (define fail-screen;;上野智ですよ
   SCENE)
 
-;;
+;;yuta
 (define success-screen
   SCENE)
 
