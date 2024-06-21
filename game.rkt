@@ -104,7 +104,7 @@
   env)
 
 ;;
-(define fail-screen
+(define fail-screen;;上野智ですよ
   SCENE)
 
 ;;
