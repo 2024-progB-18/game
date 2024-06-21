@@ -42,14 +42,19 @@
 (define frame64 (bitmap/file "frame64.bmp"))
 
 ;;ゲームスタート
-(define demo 'demo)
+(define demo "demo")
+(define test "test")
 (define (start . option)
   (cond ((null? option)
          (big-bang WORLD-ENVIROMENT
                    (to-draw display-contents)
                    (on-key key-action)))
-        ((= (car option) demo)
+        ((string=? (car option) demo)
          (big-bang WORLD-ENVIROMENT
+                   (to-draw display-contents)
+                   (on-key key-action)))
+        ((string=? (car option) test)
+         (big-bang (cons (cadr option) (cdr WORLD-ENVIROMENT))
                    (to-draw display-contents)
                    (on-key key-action)))
         (else (error "undefined option:" option))))
@@ -124,7 +129,7 @@
                         ((string=? dir "right") (cons (+ cur-x 1) cur-y)))))
     (list (screen-type env)
           (stage-selecting env)
-          (new-pos)
+          new-pos
           (stage-state-list env)
           (pause-state-list env)
           (stage-result env))))
