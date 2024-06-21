@@ -78,7 +78,7 @@
                (place-image frame64
                             512
                             288
-                            SCENE)))
+                            SCENE)));木下知哉
 
 (define (start-key-event env key)
   env)
