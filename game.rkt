@@ -95,7 +95,8 @@
        ((= select 3)(3rd-stage))
        ((= secect 4)(4th-stage))
        ((= secect 5)(5th-stage))
-       ((= secect 6)(6th-stage)))))
+       ((= secect 6)(6th-stage))))
+  env)
 ;;
 (define stage-screen
   SCENE)
