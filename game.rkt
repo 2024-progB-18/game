@@ -88,6 +88,17 @@
   SCENE)
 
 (define (selection-key-event env key);hayato
+  ;キーボード入力
+  (define (control select k)
+    (cond((string=? k "right")(+ secect 1))
+         ((string=? k "left")(- secect 1))
+         ((string=? k "up")(- secect 3))
+         ((string=? k "down")(+ secect 3))
+         ((string=? k " ")(decision-stage)))
+    )
+;選択の初期値
+  (define select 1)
+;ステージを決定する
   (define(decision-stage)
    (cond
        ((= select 1)(1st-stage))
@@ -95,7 +106,8 @@
        ((= select 3)(3rd-stage))
        ((= secect 4)(4th-stage))
        ((= secect 5)(5th-stage))
-       ((= secect 6)(6th-stage)))))
+       ((= secect 6)(6th-stage))))
+   env)
 ;;
 (define stage-screen
   SCENE)
