@@ -80,17 +80,23 @@
         (else (error "wrong enviroment"))))
 
 ;;
-(define start-screen
+(define start-screen;木下知哉
   (place-image sample-frame
                512
                288
                (place-image frame64
                             512
                             288
-                            SCENE)));木下知哉
+                            SCENE)))
 
 (define (start-key-event env key)
-  env)
+  (cond ((string=? key "enter") (list 1
+                                      (stage-selecting env)
+                                      (player-pos-in-stage env)
+                                      (stage-state-list env)
+                                      (pause-state-list env)
+                                      (stage-result env)))
+          (else env)))
 
 ;;
 (define selection-screen
