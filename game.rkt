@@ -97,14 +97,14 @@
   SCENE)
 
 (define (selection-key-event env key);hayato
-  (define(decision-stage)
-   (cond
-       ((= select 1)(1st-stage))
-       ((= select 2)(2nd-stage))
-       ((= select 3)(3rd-stage))
-       ((= secect 4)(4th-stage))
-       ((= secect 5)(5th-stage))
-       ((= secect 6)(6th-stage))))
+;  (define(decision-stage)
+;   (cond
+;       ((= select 1)(1st-stage))
+;       ((= select 2)(2nd-stage))
+;       ((= select 3)(3rd-stage))
+;       ((= secect 4)(4th-stage))
+;       ((= secect 5)(5th-stage))
+;       ((= secect 6)(6th-stage))))
   env)
 ;;
 (define stage-screen
@@ -117,7 +117,13 @@
           map-data)))
 
 (define (stage-key-event env key)
-  (cond ((dir? key) (player-move env key))
+  (cond ((string=? key "p") (list 3
+                                  (stage-selecting env)
+                                  (player-pos-in-stage env)
+                                  (stage-state-list env)
+                                  (pause-state-list env)
+                                  (stage-result env)))
+        ((dir? key) (player-move env key))
         (else env)))
 
 (define (dir? key)
