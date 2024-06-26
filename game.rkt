@@ -179,7 +179,8 @@ env)
           (stage-state-list env)
           (pause-state-list env)
           1
-          (cadr (stage-result env))))))
+          (cadr (stage-result env))))
+         (else env)))
         ((= (car env) 1)
          (cond
           ((string=? key do)
@@ -199,5 +200,6 @@ env)
           (stage-state-list env)
           (pause-state-list env)
           0
-          (cadr (stage-result env))))))
+          (cadr (stage-result env))))
+         (else env)))
         (else env)))
