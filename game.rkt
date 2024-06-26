@@ -17,7 +17,7 @@
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
-  (list 0 0 (cons 0 0) (list null) (list null) (list null)))
+  (list 0 0 (cons 0 0) (list null) (list null) (list 0 0)))
 (define (screen-type env) (car env))
 (define (stage-selecting env) (cadr env))
 (define (player-pos-in-stage env) (caddr env))
@@ -97,15 +97,16 @@
   SCENE)
 
 (define (selection-key-event env key);hayato
-  (define(decision-stage)
+  #|(define(decision-stage)
    (cond
        ((= select 1)(1st-stage))
        ((= select 2)(2nd-stage))
        ((= select 3)(3rd-stage))
        ((= secect 4)(4th-stage))
        ((= secect 5)(5th-stage))
-       ((= secect 6)(6th-stage))))
-  env)
+       ((= secect 6)(6th-stage))))|#
+env)
+
 ;;
 (define stage-screen
   SCENE)
@@ -156,4 +157,47 @@
   SCENE)
 
 (define (success-key-event env key)
-  env)
+  (define prev "up")
+  (define next "down")
+  (define do "enter")
+  (cond ((= (car env) 0)
+         (cond
+          ((string=? key do)
+          (list
+           2
+          (+ (stage-selecting env) 1)
+          (player-pos-in-stage env)
+          (stage-state-list env)
+          (pause-state-list env)
+          0
+          0))
+         ((string=? key next)
+          (list
+          (screen-type env)
+          (stage-selecting env)
+          (player-pos-in-stage env)
+          (stage-state-list env)
+          (pause-state-list env)
+          1
+          (cadr (stage-result env))))))
+        ((= (car env) 1)
+         (cond
+          ((string=? key do)
+          (list
+           1
+          (stage-selecting env)
+          (player-pos-in-stage env)
+          (stage-state-list env)
+          (pause-state-list env)
+          0
+          0))
+         ((string=? key prev)
+          (list
+          (screen-type env)
+          (stage-selecting env)
+          (player-pos-in-stage env)
+          (stage-state-list env)
+          (pause-state-list env)
+          0
+          (cadr (stage-result env))))))
+        (else env)))
