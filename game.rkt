@@ -17,9 +17,13 @@
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
-  (list 0))
-(define (screen-type env)
-  (car env))
+  (list 0 0 (cons 0 0) (list null) (list null) (list null)))
+(define (screen-type env) (car env))
+(define (stage-selecting env) (cadr env))
+(define (player-pos-in-stage env) (caddr env))
+(define (stage-state-list env) (cadddr env))
+(define (pause-state-list env) (car (cddddr env)))
+(define (stage-result env) (cadr (cddddr env)))
 
 ;;便利関数
 (define (take-element l n)
@@ -38,14 +42,19 @@
 (define frame64 (bitmap/file "frame64.bmp"))
 
 ;;ゲームスタート
-(define demo 'demo)
+(define demo "demo")
+(define test "test")
 (define (start . option)
   (cond ((null? option)
          (big-bang WORLD-ENVIROMENT
                    (to-draw display-contents)
                    (on-key key-action)))
-        ((= option demo)
+        ((string=? (car option) demo)
          (big-bang WORLD-ENVIROMENT
+                   (to-draw display-contents)
+                   (on-key key-action)))
+        ((string=? (car option) test)
+         (big-bang (cons (cadr option) (cdr WORLD-ENVIROMENT))
                    (to-draw display-contents)
                    (on-key key-action)))
         (else (error "undefined option:" option))))
@@ -78,7 +87,7 @@
                (place-image frame64
                             512
                             288
-                            SCENE)))
+                            SCENE)));木下知哉
 
 (define (start-key-event env key)
   env)
@@ -88,18 +97,17 @@
   SCENE)
 
 (define (selection-key-event env key);hayato
-  ;キーボード入力
-  (define (control select k)
-    (cond((string=? k "right")(+ secect 1))
-         ((string=? k "left")(- secect 1))
-         ((string=? k "up")(- secect 3))
-         ((string=? k "down")(+ secect 3))
-         ((string=? k " ")(decision-stage)))
-    )
-;選択の初期値
   (define select 1)
-;ステージを決定する
-  (define(decision-stage)
+  ;キーボード入力
+  (define  (control select k)
+    (cond((string=? k "right")(set! select (+ select 1)))
+         ((string=? k "left")(set! select (- select 1)))
+         ((string=? k "up")(set! select (- select 3)))
+         ((string=? k "down")(set! select (+ select 3)))
+         ((string=? k " ")(decision-stage select))
+         (else select)))
+  
+  (define(decision-stage select)
    (cond
        ((= select 1)(1st-stage))
        ((= select 2)(2nd-stage))
@@ -107,13 +115,41 @@
        ((= secect 4)(4th-stage))
        ((= secect 5)(5th-stage))
        ((= secect 6)(6th-stage))))
-   env)
+  env)
 ;;
 (define stage-screen
   SCENE)
 
+(define stage-data-tutorial
+  (let ((map-start-point (cons 0 0))
+        (map-data '()))
+    (list map-start-point
+          map-data)))
+
 (define (stage-key-event env key)
-  env)
+  (cond ((dir? key) (player-move env key))
+        (else env)))
+
+(define (dir? key)
+  (or (string=? key "up")
+      (string=? key "down")
+      (string=? key "left")
+      (string=? key "right")))
+
+(define (player-move env dir)
+  (let* ((cur-pos (player-pos-in-stage env))
+         (cur-x (car cur-pos))
+         (cur-y (cdr cur-pos))
+         (new-pos (cond ((string=? dir "up") (cons cur-x (- cur-y 1)))
+                        ((string=? dir "down") (cons cur-x (+ cur-y 1)))
+                        ((string=? dir "left") (cons (- cur-x 1) cur-y))
+                        ((string=? dir "right") (cons (+ cur-x 1) cur-y)))))
+    (list (screen-type env)
+          (stage-selecting env)
+          new-pos
+          (stage-state-list env)
+          (pause-state-list env)
+          (stage-result env))))
 
 (define pause-screen
   SCENE)
@@ -122,10 +158,10 @@
   env)
 
 ;;
-(define fail-screen
+(define fail-screen;;上野智ですよ
   SCENE)
 
-;;
+;;yuta
 (define success-screen
   SCENE)
 
