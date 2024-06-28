@@ -80,31 +80,39 @@
         (else (error "wrong enviroment"))))
 
 ;;
-(define start-screen
+(define start-screen;木下知哉
   (place-image sample-frame
                512
                288
                (place-image frame64
                             512
                             288
-                            SCENE)));木下知哉
+                            SCENE)))
 
 (define (start-key-event env key)
-  env)
+  (cond ((string=? key "enter") (list 1
+                                      (stage-selecting env)
+                                      (player-pos-in-stage env)
+                                      (stage-state-list env)
+                                      (pause-state-list env)
+                                      (stage-result env)))
+          (else env)))
 
 ;;
 (define selection-screen
   SCENE)
 
 (define (selection-key-event env key);hayato
-  #|(define(decision-stage)
+  #|
+  (define(decision-stage)
    (cond
        ((= select 1)(1st-stage))
        ((= select 2)(2nd-stage))
        ((= select 3)(3rd-stage))
        ((= secect 4)(4th-stage))
        ((= secect 5)(5th-stage))
-       ((= secect 6)(6th-stage))))|#
+       ((= secect 6)(6th-stage))))
+  |#
 env)
 
 ;;
@@ -118,7 +126,13 @@ env)
           map-data)))
 
 (define (stage-key-event env key)
-  (cond ((dir? key) (player-move env key))
+  (cond ((string=? key "p") (list 3
+                                  (stage-selecting env)
+                                  (player-pos-in-stage env)
+                                  (stage-state-list env)
+                                  (pause-state-list env)
+                                  (stage-result env)))
+        ((dir? key) (player-move env key))
         (else env)))
 
 (define (dir? key)
