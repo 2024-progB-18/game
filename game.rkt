@@ -25,6 +25,35 @@
 (define (pause-state-list env) (car (cddddr env)))
 (define (stage-result env) (cadr (cddddr env)))
 
+(define screen 0)
+(define select 1)
+(define pos 2)
+(define stage 3)
+(define pause 4)
+(define result 5)
+(define (edit env . content)
+  (define (make-pair l result)
+    (if (null? l)
+        result
+        (make-pair (cddr l) (cons (cons (car l) (cadr l)) result))))
+  (define (add-in-order pair)
+    (define (bubble p)
+      (cond ((null? (cdr p)) p)
+            ((> (caar p) (caadr p))
+             (cons (cadr p) (bubble (cons (car p) (cddr p)))))
+            (else (cons (car p) (bubble (cdr p))))))
+    (define (sorting p)
+      (define new-p (bubble p))
+      (if (null? (cdr p))
+          p
+          (cons (car new-p) (sorting (cdr new-p)))))
+    (sorting pair))
+  (define (edit-env env pair n)
+    (cond ((null? env) null)
+          ((and (not (null? pair)) (= n (caar pair)))
+           (cons (cdar pair) (edit-env (cdr env) (cdr pair) (+ n 1))))
+          (else (cons (car env) (edit-env (cdr env) pair (+ n 1))))))
+  (edit-env env (add-in-order (make-pair content null)) 0))
 ;;便利関数
 (define (take-element l n)
   (define (search-rec l n)
@@ -120,6 +149,7 @@
   (cond ((string=? key "p") (list 3
                                   (stage-selecting env)
                                   (player-pos-in-stage env)
+
                                   (stage-state-list env)
                                   (pause-state-list env)
                                   (stage-result env)))
