@@ -54,6 +54,7 @@
            (cons (cdar pair) (edit-env (cdr env) (cdr pair) (+ n 1))))
           (else (cons (car env) (edit-env (cdr env) pair (+ n 1))))))
   (edit-env env (add-in-order (make-pair content null)) 0))
+
 ;;便利関数
 (define (take-element l n)
   (define (search-rec l n)
