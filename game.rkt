@@ -176,7 +176,7 @@
 (define  (control i k)
     (cond((string=? k "right")(set! i (+ i 1)))
          ((string=? k "left")(set! i (- i 1)))
-         ((string=? k "enter") i)))
+         ((string=? k "enter") i))) ;後で下の関数とつなげる
   #|
   (define(decision-stage i)
    (cond
