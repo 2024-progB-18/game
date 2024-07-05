@@ -17,7 +17,7 @@
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
-  (list 0 0 (cons 0 0) (list null) (list null) (list null)))
+  (list 0 0 (cons 0 0) (list null) (list 1) (list null)))
 (define (screen-type env) (car env))
 (define (stage-selecting env) (cadr env))
 (define (player-pos-in-stage env) (caddr env))
@@ -141,14 +141,55 @@
           (pause-state-list env)
           (stage-result env))))
 
-(define pause-screen
+(define pause-screen;;上野智ですよ
   SCENE)
 
 (define (pause-key-event env key)
-  env)
+  (cond ((string=? key "up");;一つ上に移動
+           (list (screen-type env)
+                 (stage-selecting env)
+                 (player-move env)
+                 (stage-state-list env)
+                 (list (+ 1 (car (pause-state-list env))))
+                 (stage-result env)))
+        
+           ((string=? key "down");;一つ下に移動
+            (list (screen-type env)
+                  (stage-selecting env)
+                  (player-move env)
+                  (stage-state-list env)
+                  (list (- (car (pause-state-list env)) 1))
+                  (stage-state-list env)))
+           
+        ((string=? key "enter")
+           (cond ((= (car (pause-state-list env)) 1)
+                  (list (screen-type env)
+                        0
+                        (player-move env)
+                        (stage-state-list env)
+                        (pause-state-list env)
+                        (stage-result env)));;真ん中にいるときstage-slectへ
+                 
+                 ((= (list (car (pause-state-list env))) 2)
+                   ((= (screen-type env) 2)));;上にいるときpausemenuを閉じる
+                 
+                 ((= (list (car (pause-state-list env))) 0)
+                  (list (screen-type env)
+                        ((stage-selecting env) 
+                        ((cons 0 0))
+                        (stage-state-list env)
+                        (pause-state-list env)
+                        (stage-result env)));;下にいるときRestart,キャラを初期位置に戻す。行動回数のリセット。
+
+                  ((or (< (list (car (pause-state-list env))) 0)
+                       (> (list (car (pause-state-list env))) 2))
+                   env);;pausemenuのボタンの範囲外に行かないようにする。
+                 )))
+        (else env)))
+   
 
 ;;
-(define fail-screen;;上野智ですよ
+(define fail-screen
   SCENE)
 
 ;;yuta
