@@ -5,8 +5,8 @@
 (require lang/posn)
 
 ;;背景(外枠)スクリーンの定義
-(define SCENE-WIDTH 1280)
-(define SCENE-HEIGHT 768)
+(define SCENE-WIDTH 1280);;大きさが合わなかったので変えました
+(define SCENE-HEIGHT 768);;14インチの画面だとタスクバー抜きでの適正サイズはこれくらいになりそうです
 (define SCENE (empty-scene SCENE-WIDTH SCENE-HEIGHT "white"))
 
 ;;１マスの大きさ
@@ -117,7 +117,7 @@
         ((= (screen-type env) 2) (stage-screen env))
         ((= (screen-type env) 3) pause-screen)
         ((= (screen-type env) 4) fail-screen)
-        ((= (screen-type env) 5) success-screen)
+        ((= (screen-type env) 5) (success-screen env)) ;;描画に環境変数が必要なため変えてます
         (else (error "wrong enviroment"))))
 
 ;;キーボード入力で発火
@@ -256,11 +256,35 @@ env)
   SCENE)
 
 ;;yuta
-(define success-screen
-  SCENE)
+(define (success-screen env)
+  (define cx (/ SCENE-WIDTH 2))
+  (define cy (/ SCENE-HEIGHT 2))
+  (define BOTTON-WIDTH (/ cx 2))
+  (define BOTTON-HEIGHT (/ cy 3))
+  (define BOTTON-TXTSIZE (/ SCENE-HEIGHT 16))
+  (define TITLE-TXTSIZE (* 2 BOTTON-TXTSIZE))
+  (define BOTTON-NEX-Y cy)
+  (define BOTTON-SEL-Y (+ cy (/ cy 2)))
+  (define TITLE-Y (- cy (/ cy 2)))
+  (define botton (rectangle BOTTON-WIDTH BOTTON-HEIGHT "solid" "orange"))
+  (define (title-success s)
+    (place-image (text "SUCCESS" TITLE-TXTSIZE "red") cx TITLE-Y s))
+  (define (botton-nextstage s)
+    (place-image (text "next stage" BOTTON-TXTSIZE "black") cx BOTTON-NEX-Y
+               (place-image botton cx BOTTON-NEX-Y s)))
+  (define (botton-selectstage s)
+    (place-image (text "select stage" BOTTON-TXTSIZE "black") cx BOTTON-SEL-Y
+               (place-image botton cx BOTTON-SEL-Y s)))
+  (define (outline-select env s)
+    (define y
+      (if (= (car (stage-result env)) 0)
+          BOTTON-NEX-Y
+          BOTTON-SEL-Y))
+    (place-image (rectangle (+ BOTTON-WIDTH (/ BOTTON-WIDTH 8)) (+ BOTTON-HEIGHT (/ BOTTON-WIDTH 8)) "outline" "red") cx y s))
+  (outline-select env (botton-selectstage (botton-nextstage (title-success SCENE)))))
 
 (define (success-key-event env key)
-  (define prev "up")
+ #| (define prev "up")
   (define next "down")
   (define do "enter")
   (cond ((= (car env) 0)
@@ -305,4 +329,5 @@ env)
           0
           (cadr (stage-result env))))
          (else env)))
-        (else env)))
+  (else env)))|#
+  env);;動作させないための仮置きなのでいずれ消します
