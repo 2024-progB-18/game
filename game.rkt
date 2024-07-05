@@ -203,21 +203,26 @@ env)
   (define cy (/ SCENE-HEIGHT 2))
   (define BOTTON-WIDTH (/ cx 2))
   (define BOTTON-HEIGHT (/ cy 3))
+  (define BOTTON-TXTSIZE (/ SCENE-HEIGHT 16))
+  (define TITLE-TXTSIZE (* 2 BOTTON-TXTSIZE))
+  (define BOTTON-NEX-Y cy)
+  (define BOTTON-SEL-Y (+ cy (/ cy 2)))
+  (define TITLE-Y (- cy (/ cy 2)))
   (define botton (rectangle BOTTON-WIDTH BOTTON-HEIGHT "solid" "orange"))
   (define (title-success s)
-    (place-image (text "success" 96 "red") cx (- cy (/ cy 2)) s))
+    (place-image (text "SUCCESS" TITLE-TXTSIZE "red") cx TITLE-Y s))
   (define (botton-nextstage s)
-    (place-image (text "next stage" 48 "black") cx cy
-               (place-image botton cx cy s)))
+    (place-image (text "next stage" BOTTON-TXTSIZE "black") cx BOTTON-NEX-Y
+               (place-image botton cx BOTTON-NEX-Y s)))
   (define (botton-selectstage s)
-    (place-image (text "select stage" 48 "black") cx (+ cy (/ cy 2))
-               (place-image botton cx (+ cy (/ cy 2)) s)))
+    (place-image (text "select stage" BOTTON-TXTSIZE "black") cx BOTTON-SEL-Y
+               (place-image botton cx BOTTON-SEL-Y s)))
   (define (outline-select env s)
     (define y
       (if (= (car (stage-result env)) 0)
-          cy
-          (+ cy (/ cy 2))))
-    (place-image (rectangle (+ BOTTON-WIDTH 48) (+ BOTTON-HEIGHT 36) "outline" "red") cx y s))
+          BOTTON-NEX-Y
+          BOTTON-SEL-Y))
+    (place-image (rectangle (+ BOTTON-WIDTH (/ BOTTON-WIDTH 8)) (+ BOTTON-HEIGHT (/ BOTTON-WIDTH 8)) "outline" "red") cx y s))
   (outline-select env (botton-selectstage (botton-nextstage (title-success SCENE)))))
 
 (define (success-key-event env key)
