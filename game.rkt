@@ -72,6 +72,26 @@
 (define sample-black (bitmap/file "sample-black.bmp"))
 (define frame64 (bitmap/file "frame64.bmp"))
 
+;;ステージデータ
+(define (init-step-remain map-data) (car map-data))
+(define (init-player-pos map-data) (cadr map-data))
+(define (map-size map-data) (caddr map-data))
+(define (field-data map-data) (cadddr map-data))
+
+(define map-data-tutorial
+  '(10
+    (0 . 0)
+    (8 . 8)
+    ((0 0 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0))))
+
+
 ;;ゲームスタート
 (define demo "demo")
 (define test "test")
@@ -146,10 +166,10 @@
   |#
 env)
 
-;;
+;;taisei
 (define (stage-screen env)
   (define map-data
-    (cond ((= (stage-selecting env) 0) (caddr map-data-tutorial))
+    (cond ((= (stage-selecting env) 0) (field-data map-data-tutorial))
           (else (error "out of range :" (stage-selecting env)))))
   (define (map-image-list)
     (define (make-row row pos)
@@ -185,22 +205,8 @@ env)
                   SCENE))
   map-field)
 
-(define map-data-tutorial
-  '(10
-    (0 . 0)
-    ((0 0 0 0)
-     (0 0 0 0)
-     (0 0 0 0)
-     (0 0 0 0))))
-
 (define (stage-key-event env key)
-  (cond ((string=? key "p") (list 3
-                                  (stage-selecting env)
-                                  (player-pos-in-stage env)
-
-                                  (stage-state-list env)
-                                  (pause-state-list env)
-                                  (stage-result env)))
+  (cond ((string=? key "p") (edit env screen 3))
         ((dir? key) (player-move env key))
         (else env)))
 
@@ -214,10 +220,29 @@ env)
   (let* ((cur-pos (player-pos-in-stage env))
          (cur-x (car cur-pos))
          (cur-y (cdr cur-pos))
-         (new-pos (cond ((string=? dir "up") (cons cur-x (- cur-y 1)))
-                        ((string=? dir "down") (cons cur-x (+ cur-y 1)))
-                        ((string=? dir "left") (cons (- cur-x 1) cur-y))
-                        ((string=? dir "right") (cons (+ cur-x 1) cur-y)))))
+         (new-pos
+          (cond ((string=? dir "up")
+                 (cons cur-x
+                       (if (= cur-y 0)
+                           0
+                           (- cur-y 1))))
+                ((string=? dir "down")
+                 (let ((lim (- (cdr (map-size map-data-tutorial)) 1)))
+                   (cons cur-x
+                         (if (= cur-y lim)
+                             lim
+                             (+ cur-y 1)))))
+                ((string=? dir "left")
+                 (cons (if (= cur-x 0)
+                           0
+                           (- cur-x 1))
+                       cur-y))
+                ((string=? dir "right")
+                 (let ((lim (- (car (map-size map-data-tutorial)) 1)))
+                   (cons (if (= cur-x lim)
+                             lim
+                             (+ cur-x 1))
+                         cur-y))))))
     (edit env pos new-pos)))
 
 (define pause-screen
