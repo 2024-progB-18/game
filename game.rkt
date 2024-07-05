@@ -2,10 +2,11 @@
 (require "reactor-lib.rkt")
 (require 2htdp/image)
 (require 2htdp/universe)
+(require lang/posn)
 
 ;;背景(外枠)スクリーンの定義
-(define SCENE-WIDTH 1920)
-(define SCENE-HEIGHT 1024)
+(define SCENE-WIDTH 1280)
+(define SCENE-HEIGHT 768)
 (define SCENE (empty-scene SCENE-WIDTH SCENE-HEIGHT "white"))
 
 ;;１マスの大きさ
@@ -93,7 +94,7 @@
 (define (display-contents env)
   (cond ((= (screen-type env) 0) start-screen)
         ((= (screen-type env) 1) selection-screen)
-        ((= (screen-type env) 2) stage-screen)
+        ((= (screen-type env) 2) (stage-screen env))
         ((= (screen-type env) 3) pause-screen)
         ((= (screen-type env) 4) fail-screen)
         ((= (screen-type env) 5) success-screen)
@@ -146,14 +147,51 @@
 env)
 
 ;;
-(define stage-screen
-  SCENE)
+(define (stage-screen env)
+  (define map-data
+    (cond ((= (stage-selecting env) 0) (caddr map-data-tutorial))
+          (else (error "out of range :" (stage-selecting env)))))
+  (define (map-image-list)
+    (define (make-row row pos)
+      (if (null? row)
+          '()
+          (cons
+           (cond
+             ((and (= (car (player-pos-in-stage env)) (car pos))
+                   (= (cdr (player-pos-in-stage env)) (cdr pos))) sample-square)
+             (else frame64))
+           (make-row (cdr row) (cons (+ (car pos) 1) (cdr pos))))))
+    (define (make-col col pos)
+      (if (null? col)
+          '()
+          (append (make-row (car col) (cons 0 pos))
+                  (make-col (cdr col) (+ pos 1)))))
+    (make-col map-data 0))
+  (define (map-pos-list)
+    (define (make-row row x y)
+      (if (null? row)
+          '()
+          (cons (make-posn x y)
+                (make-row (cdr row) (+ x SQUARE) y))))
+    (define (make-col col y)
+      (if (null? col)
+          '()
+          (append (make-row (car col) 32 y)
+                  (make-col (cdr col) (+ y SQUARE)))))
+    (make-col map-data 32))
+  (define map-field
+    (place-images (map-image-list)
+                  (map-pos-list)
+                  SCENE))
+  map-field)
 
-(define stage-data-tutorial
-  (let ((map-start-point (cons 0 0))
-        (map-data '()))
-    (list map-start-point
-          map-data)))
+(define map-data-tutorial
+  '(10
+    (0 . 0)
+    ((0 0 0 0)
+     (0 0 0 0)
+     (0 0 0 0)
+     (0 0 0 0))))
 
 (define (stage-key-event env key)
   (cond ((string=? key "p") (list 3
@@ -180,12 +218,7 @@ env)
                         ((string=? dir "down") (cons cur-x (+ cur-y 1)))
                         ((string=? dir "left") (cons (- cur-x 1) cur-y))
                         ((string=? dir "right") (cons (+ cur-x 1) cur-y)))))
-    (list (screen-type env)
-          (stage-selecting env)
-          new-pos
-          (stage-state-list env)
-          (pause-state-list env)
-          (stage-result env))))
+    (edit env pos new-pos)))
 
 (define pause-screen
   SCENE)
