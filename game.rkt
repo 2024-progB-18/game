@@ -94,8 +94,28 @@
 
 ;;
 (define selection-screen
-  SCENE)
+   (define (draw-scene x)
+    (place-image (text "stage 1" 64 "white")
+                 320
+                 256
+                 (place-image (text "stage 2" 64 "white")
+                              960
+                              256
+                              (place-image (text "stage 3" 64 "white")
+                                                 1600
+                                                 256
+                                                 (place-image (text "stage 4" 64 "white")
+                                                              320
+                                                              786
+                                                              (place-image (text "stage 5" 64 "white")
+                                                                           960
+                                                                           786
+                                                                           (place-image (text "stage 6" 64 "white")
+                                                                                        1600
+                                                                                        786
+                                                                                        SCENE))))))))
 
+<<<<<<< Updated upstream
 (define (selection-key-event env key);hayato
   (define select 1)
   ;キーボード入力
@@ -116,6 +136,24 @@
        ((= secect 5)(5th-stage))
        ((= secect 6)(6th-stage))))
   env)
+=======
+(define (selection-key-event env key);hayato  
+  (define selection-stage w
+    (cond
+      ((string=? w "right")(+ i 1))
+      ((string=? w "left") (- i 1))
+      ((string=? w " ") (decision-stage i))))
+  (define (decision-stage i)
+   (cond
+       ((= i 1)(= key 1))
+       ((= i 2)(= key 2))
+       ((= i 3)(= key 3))
+       ((= i 4)(= key 4))
+       ((= i 5)(= key 5))
+       ((= i 6)(= key 6))))
+env)
+
+>>>>>>> Stashed changes
 ;;
 (define stage-screen
   SCENE)
