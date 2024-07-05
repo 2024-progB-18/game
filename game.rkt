@@ -116,6 +116,7 @@
                                                                                         SCENE))))))))
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 (define (selection-key-event env key);hayato
   (define select 1)
   ;キーボード入力
@@ -145,6 +146,16 @@
       ((string=? w " ") (decision-stage i))))
   (define (decision-stage i)
    (cond
+=======
+(define (selection-key-event env key);hayato  
+  (define selection-stage w
+    (cond
+      ((string=? w "right")(+ i 1))
+      ((string=? w "left") (- i 1))
+      ((string=? w " ") (decision-stage i))))
+  (define (decision-stage i)
+   (cond
+>>>>>>> Stashed changes
        ((= i 1)(= key 1))
        ((= i 2)(= key 2))
        ((= i 3)(= key 3))
