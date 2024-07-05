@@ -4,8 +4,8 @@
 (require 2htdp/universe)
 
 ;;背景(外枠)スクリーンの定義
-(define SCENE-WIDTH 1920)
-(define SCENE-HEIGHT 1024)
+(define SCENE-WIDTH 1280);;大きさが合わなかったので変えました
+(define SCENE-HEIGHT 768);;14インチの画面だとタスクバー抜きでの適正サイズはこれくらいになりそうです
 (define SCENE (empty-scene SCENE-WIDTH SCENE-HEIGHT "white"))
 
 ;;１マスの大きさ
@@ -96,7 +96,7 @@
         ((= (screen-type env) 2) stage-screen)
         ((= (screen-type env) 3) pause-screen)
         ((= (screen-type env) 4) fail-screen)
-        ((= (screen-type env) 5) success-screen)
+        ((= (screen-type env) 5) (success-screen env)) ;;描画に環境変数が必要なため変えてます
         (else (error "wrong enviroment"))))
 
 ;;キーボード入力で発火
@@ -198,11 +198,30 @@ env)
   SCENE)
 
 ;;yuta
-(define success-screen
-  SCENE)
+(define (success-screen env)
+  (define cx (/ SCENE-WIDTH 2))
+  (define cy (/ SCENE-HEIGHT 2))
+  (define BOTTON-WIDTH (/ cx 2))
+  (define BOTTON-HEIGHT (/ cy 3))
+  (define botton (rectangle BOTTON-WIDTH BOTTON-HEIGHT "solid" "orange"))
+  (define (title-success s)
+    (place-image (text "success" 96 "red") cx (- cy (/ cy 2)) s))
+  (define (botton-nextstage s)
+    (place-image (text "next stage" 48 "black") cx cy
+               (place-image botton cx cy s)))
+  (define (botton-selectstage s)
+    (place-image (text "select stage" 48 "black") cx (+ cy (/ cy 2))
+               (place-image botton cx (+ cy (/ cy 2)) s)))
+  (define (outline-select env s)
+    (define y
+      (if (= (car (stage-result env)) 0)
+          cy
+          (+ cy (/ cy 2))))
+    (place-image (rectangle (+ BOTTON-WIDTH 48) (+ BOTTON-HEIGHT 36) "outline" "red") cx y s))
+  (outline-select env (botton-selectstage (botton-nextstage (title-success SCENE)))))
 
 (define (success-key-event env key)
-  (define prev "up")
+ #| (define prev "up")
   (define next "down")
   (define do "enter")
   (cond ((= (car env) 0)
@@ -247,4 +266,5 @@ env)
           0
           (cadr (stage-result env))))
          (else env)))
-        (else env)))
+  (else env)))|#
+  env);;動作させないための仮置きなのでいずれ消します
