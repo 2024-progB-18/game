@@ -43,12 +43,11 @@
             ((> (caar p) (caadr p))
              (cons (cadr p) (bubble (cons (car p) (cddr p)))))
             (else (cons (car p) (bubble (cdr p))))))
-    (define (sorting p)
-      (define new-p (bubble p))
-      (if (null? (cdr p))
-          p
-          (cons (car new-p) (sorting (cdr new-p)))))
-    (sorting pair))
+    (define (sorting n result)
+      (if (= n 1)
+          result
+          (sorting (- n 1) (bubble result))))
+    (sorting (length pair) pair))
   (define (edit-env env pair n)
     (cond ((null? env) null)
           ((and (not (null? pair)) (= n (caar pair)))
