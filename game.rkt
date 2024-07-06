@@ -78,6 +78,9 @@
 (define sample-frame (bitmap/file "sample-frame.bmp"))
 (define sample-black (bitmap/file "sample-black.bmp"))
 (define frame64 (bitmap/file "frame64.bmp"))
+(define smile (bitmap/file "smile.bmp"))
+(define wall (bitmap/file "iron-barred-block.bmp"))
+(define ground (bitmap/file "green-grass.bmp"))
 
 ;;ステージデータ
 (define (init-step-remain map-data) (car map-data))
@@ -90,12 +93,12 @@
     (0 . 0)
     (8 . 8)
     ((0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0)
-     (0 0 0 w w 0 0 0)
-     (0 0 0 w w 0 0 0)
-     (0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0)
+     (0 w 0 w 0 0 0 0)
+     (0 w 0 w 0 0 0 0)
+     (0 w 0 w w w 0 0)
+     (0 w 0 0 0 w 0 0)
+     (0 w 0 w 0 w 0 0)
+     (w w 0 w 0 w w 0)
      (0 0 0 0 0 0 0 0))))
 
 
@@ -185,9 +188,9 @@ env)
           (cons
            (cond
              ((and (= (car (player-pos-in-stage env)) (car pos))
-                   (= (cdr (player-pos-in-stage env)) (cdr pos))) sample-square)
-             ((eq? (car row) 'w) sample-black)
-             (else frame64))
+                   (= (cdr (player-pos-in-stage env)) (cdr pos))) smile)
+             ((eq? (car row) 'w) wall)
+             (else ground))
            (make-row (cdr row) (cons (+ (car pos) 1) (cdr pos))))))
     (define (make-col col pos)
       (if (null? col)
