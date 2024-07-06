@@ -1,3 +1,4 @@
+
 #lang racket
 (require "reactor-lib.rkt")
 (require 2htdp/image)
@@ -18,7 +19,7 @@
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
-  (list 0 0 (cons 0 0) (list null) (list null) (list 0 0)))
+  (list 0 0 (cons 0 0) (list null) (list null) (list 0)))
 (define (screen-type env) (car env))
 (define (stage-selecting env) (cadr env))
 (define (player-pos-in-stage env) (caddr env))
@@ -43,12 +44,11 @@
             ((> (caar p) (caadr p))
              (cons (cadr p) (bubble (cons (car p) (cddr p)))))
             (else (cons (car p) (bubble (cdr p))))))
-    (define (sorting p)
-      (define new-p (bubble p))
-      (if (null? (cdr p))
-          p
-          (cons (car new-p) (sorting (cdr new-p)))))
-    (sorting pair))
+    (define (sorting n result)
+      (if (= n 1)
+          result
+          (sorting (- n 1) (bubble result))))
+    (sorting (length pair) pair))
   (define (edit-env env pair n)
     (cond ((null? env) null)
           ((and (not (null? pair)) (= n (caar pair)))
@@ -67,6 +67,11 @@
       (search-rec l n)))
 (define (take-element2 l2 pos)
   (take-element (take-element l2 (cdr pos)) (car pos)))
+
+;;test用関数
+(define (select-print env s)
+  (place-image (text (number->string (screen-type env)) 25 "black")
+               (- SCENE-WIDTH 25) (- SCENE-HEIGHT 25) s))
 
 ;;画像のロード
 (define sample-square (bitmap/file "sample-square.bmp"))
@@ -286,53 +291,25 @@ env)
           BOTTON-NEX-Y
           BOTTON-SEL-Y))
     (place-image (rectangle (+ BOTTON-WIDTH (/ BOTTON-WIDTH 8)) (+ BOTTON-HEIGHT (/ BOTTON-WIDTH 8)) "outline" "red") cx y s))
-  (outline-select env (botton-selectstage (botton-nextstage (title-success SCENE)))))
+  (outline-select env (botton-selectstage (botton-nextstage (title-success
+                                                   ;;test用 (select-print env SCENE)
+                                                             SCENE
+                                                             )))))
 
 (define (success-key-event env key)
- #| (define prev "up")
+  (define prev "up")
   (define next "down")
-  (define do "enter")
-  (cond ((= (car env) 0)
-         (cond
-          ((string=? key do)
-          (list
-           2
-          (+ (stage-selecting env) 1)
-          (player-pos-in-stage env)
-          (stage-state-list env)
-          (pause-state-list env)
-          0
-          0))
-         ((string=? key next)
-          (list
-          (screen-type env)
-          (stage-selecting env)
-          (player-pos-in-stage env)
-          (stage-state-list env)
-          (pause-state-list env)
-          1
-          (cadr (stage-result env))))
-         (else env)))
-        ((= (car env) 1)
-         (cond
-          ((string=? key do)
-          (list
-           1
-          (stage-selecting env)
-          (player-pos-in-stage env)
-          (stage-state-list env)
-          (pause-state-list env)
-          0
-          0))
-         ((string=? key prev)
-          (list
-          (screen-type env)
-          (stage-selecting env)
-          (player-pos-in-stage env)
-          (stage-state-list env)
-          (pause-state-list env)
-          0
-          (cadr (stage-result env))))
-         (else env)))
-  (else env)))|#
-  env);;動作させないための仮置きなのでいずれ消します
+  (define do "\r")
+   (cond ((= (car (stage-result env)) 0)
+         (cond ((string=? key do)
+                (edit env screen 2 select (+ (stage-selecting env) 1) result (list 0)))
+               ((string=? key next)
+                (edit env result (list 1)))
+               (else env)))
+        ((= (car (stage-result env)) 1)
+         (cond ((string=? key do)
+                (edit env screen 1 select 0 result (list 0)))
+               ((string=? key prev)
+                (edit env result (list 0)))
+               (else env)))
+        (else env)))
