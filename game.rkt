@@ -211,10 +211,19 @@ env)
     (place-images (map-image-list)
                   (map-pos-list)
                   SCENE))
-  map-field)
+  (define counter
+    (let ((text (text/font (number->string (car (stage-state-list env)))
+                           128 "black" #f 'modern 'italic 'bold #f)))
+      text))
+  (place-image counter
+               (- SCENE-WIDTH 96)
+               (- SCENE-HEIGHT 64)
+               map-field))
 
 (define (stage-key-event env key)
   (define action-key "\r")
+  (define count-act (cons (- (car (stage-state-list env)) 1)
+                             (cdr (stage-state-list env))))
   (define (player-move env dir)
   (let* ((cur-pos (player-pos-in-stage env))
          (cur-x (car cur-pos))
@@ -222,36 +231,31 @@ env)
          (map-data map-data-tutorial)
          (new-pos
           (cond ((string=? dir "up")
-                 (cons cur-x
-                       (if (= cur-y 0)
-                           0
-                           (- cur-y 1))))
+                 (if (= cur-y 0)
+                     cur-pos
+                     (cons cur-x (- cur-y 1))))
                 ((string=? dir "down")
-                 (let ((lim (- (cdr (map-size map-data)) 1)))
-                   (cons cur-x
-                         (if (= cur-y lim)
-                             lim
-                             (+ cur-y 1)))))
+                 (if (= cur-y (- (cdr (map-size map-data)) 1))
+                     cur-pos
+                     (cons cur-x (+ cur-y 1))))
                 ((string=? dir "left")
-                 (cons (if (= cur-x 0)
-                           0
-                           (- cur-x 1))
-                       cur-y))
+                 (if (= cur-x 0)
+                     cur-pos
+                     (cons (- cur-x 1) cur-y)))
                 ((string=? dir "right")
-                 (let ((lim (- (car (map-size map-data)) 1)))
-                   (cons (if (= cur-x lim)
-                             lim
-                             (+ cur-x 1))
-                         cur-y))))))
-    (cond ((eq? (take-element2 (field-data map-data) new-pos) 'w) env)
+                 (if (= cur-x (- (car (map-size map-data)) 1))
+                     cur-pos
+                     (cons (+ cur-x 1) cur-y))))))
+    (cond ((or (eq? (take-element2 (field-data map-data) new-pos) 'w)
+               (and (= (car cur-pos) (car new-pos))
+                    (= (cdr cur-pos) (cdr new-pos)))) env)
           (else
            (edit env
                  pos new-pos
-                 stage (cons (- (car (stage-state-list env)))
-                             (cdr (stage-state-list env))))))))
+                 stage count-act)))))
   (cond ((string=? key "p") (edit env screen 3))
         ((dir? key) (player-move env key))
-        ((string=? key action-key) env)
+        ((string=? key action-key) (edit env stage count-act))
         (else env)))
 
 (define (dir? key)
