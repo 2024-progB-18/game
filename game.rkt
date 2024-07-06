@@ -19,7 +19,7 @@
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
-  (list 0 0 (cons 0 0) (list null) (list null) (list 0)))
+  (list 0 0 (cons 0 0) (list 99) (list null) (list 0)))
 (define (screen-type env) (car env))
 (define (stage-selecting env) (cadr env))
 (define (player-pos-in-stage env) (caddr env))
@@ -214,17 +214,8 @@ env)
   map-field)
 
 (define (stage-key-event env key)
-  (cond ((string=? key "p") (edit env screen 3))
-        ((dir? key) (player-move env key))
-        (else env)))
-
-(define (dir? key)
-  (or (string=? key "up")
-      (string=? key "down")
-      (string=? key "left")
-      (string=? key "right")))
-
-(define (player-move env dir)
+  (define action-key "\r")
+  (define (player-move env dir)
   (let* ((cur-pos (player-pos-in-stage env))
          (cur-x (car cur-pos))
          (cur-y (cdr cur-pos))
@@ -253,7 +244,21 @@ env)
                              (+ cur-x 1))
                          cur-y))))))
     (cond ((eq? (take-element2 (field-data map-data) new-pos) 'w) env)
-          (else (edit env pos new-pos)))))
+          (else
+           (edit env
+                 pos new-pos
+                 stage (cons (- (car (stage-state-list env)))
+                             (cdr (stage-state-list env))))))))
+  (cond ((string=? key "p") (edit env screen 3))
+        ((dir? key) (player-move env key))
+        ((string=? key action-key) env)
+        (else env)))
+
+(define (dir? key)
+  (or (string=? key "up")
+      (string=? key "down")
+      (string=? key "left")
+      (string=? key "right")))
 
 (define pause-screen
   SCENE)
