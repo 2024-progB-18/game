@@ -65,6 +65,8 @@
   (if (>= n (length l))
       (error "out of range")
       (search-rec l n)))
+(define (take-element2 l2 pos)
+  (take-element (take-element l2 (cdr pos)) (car pos)))
 
 ;;画像のロード
 (define sample-square (bitmap/file "sample-square.bmp"))
@@ -85,8 +87,8 @@
     ((0 0 0 0 0 0 0 0)
      (0 0 0 0 0 0 0 0)
      (0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0)
+     (0 0 0 w w 0 0 0)
+     (0 0 0 w w 0 0 0)
      (0 0 0 0 0 0 0 0)
      (0 0 0 0 0 0 0 0)
      (0 0 0 0 0 0 0 0))))
@@ -179,6 +181,7 @@ env)
            (cond
              ((and (= (car (player-pos-in-stage env)) (car pos))
                    (= (cdr (player-pos-in-stage env)) (cdr pos))) sample-square)
+             ((eq? (car row) 'w) sample-black)
              (else frame64))
            (make-row (cdr row) (cons (+ (car pos) 1) (cdr pos))))))
     (define (make-col col pos)
@@ -220,6 +223,7 @@ env)
   (let* ((cur-pos (player-pos-in-stage env))
          (cur-x (car cur-pos))
          (cur-y (cdr cur-pos))
+         (map-data map-data-tutorial)
          (new-pos
           (cond ((string=? dir "up")
                  (cons cur-x
@@ -227,7 +231,7 @@ env)
                            0
                            (- cur-y 1))))
                 ((string=? dir "down")
-                 (let ((lim (- (cdr (map-size map-data-tutorial)) 1)))
+                 (let ((lim (- (cdr (map-size map-data)) 1)))
                    (cons cur-x
                          (if (= cur-y lim)
                              lim
@@ -238,12 +242,13 @@ env)
                            (- cur-x 1))
                        cur-y))
                 ((string=? dir "right")
-                 (let ((lim (- (car (map-size map-data-tutorial)) 1)))
+                 (let ((lim (- (car (map-size map-data)) 1)))
                    (cons (if (= cur-x lim)
                              lim
                              (+ cur-x 1))
                          cur-y))))))
-    (edit env pos new-pos)))
+    (cond ((eq? (take-element2 (field-data map-data) new-pos) 'w) env)
+          (else (edit env pos new-pos)))))
 
 (define pause-screen
   SCENE)
