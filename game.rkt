@@ -102,26 +102,6 @@
      (0 0 0 0 0 0 0 0))))
 
 
-;;ステージデータ
-(define (init-step-remain map-data) (car map-data))
-(define (init-player-pos map-data) (cadr map-data))
-(define (map-size map-data) (caddr map-data))
-(define (field-data map-data) (cadddr map-data))
-
-(define map-data-tutorial
-  '(10
-    (0 . 0)
-    (8 . 8)
-    ((0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0))))
-
-
 ;;ゲームスタート
 (define demo "demo")
 (define test "test")
@@ -233,7 +213,7 @@
 
 ;;taisei
 (define (stage-screen env)
-(define map-data
+ (define map-data
     (cond ((= (stage-selecting env) 0) (field-data map-data-tutorial))
           (else (error "out of range :" (stage-selecting env)))))
   (define (map-image-list)
