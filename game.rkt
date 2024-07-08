@@ -234,7 +234,6 @@
 ;;taisei
 (define (stage-screen env)
 (define map-data
-
     (cond ((= (stage-selecting env) 0) (field-data map-data-tutorial))
           (else (error "out of range :" (stage-selecting env)))))
   (define (map-image-list)
@@ -270,7 +269,6 @@
     (place-images (map-image-list)
                   (map-pos-list)
                   SCENE))
-  
   (define counter
     (let ((text (text/font (number->string (car (stage-state-list env)))
                            128 "black" #f 'modern 'italic 'bold #f)))
@@ -316,7 +314,6 @@
   (cond ((string=? key "p") (edit env screen 3))
         ((dir? key) (player-move env key))
         ((string=? key action-key) (edit env stage count-act))
->>>>>>> f9821f415276b4e4a019c6d649c6062e9be6f9cb
         (else env)))
 
 (define (dir? key)
@@ -361,8 +358,6 @@
           BOTTON-NEX-Y
           BOTTON-SEL-Y))
     (place-image (rectangle (+ BOTTON-WIDTH (/ BOTTON-WIDTH 8)) (+ BOTTON-HEIGHT (/ BOTTON-WIDTH 8)) "outline" "red") cx y s))
- 
-        
   (outline-select env (botton-selectstage (botton-nextstage (title-success
                                                    ;;test用 (select-print env SCENE)
                                                              SCENE
