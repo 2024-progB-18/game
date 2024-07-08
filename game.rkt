@@ -1,5 +1,3 @@
-
-
 #lang racket
 (require "reactor-lib.rkt")
 (require 2htdp/image)
@@ -20,7 +18,7 @@
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
-  (list 0 0 (cons 0 0) (list null) (list null) (list 0 0)))
+  (list 0 0 (cons 0 0) (list 99) (list null) (list 0)))
 (define (screen-type env) (car env))
 (define (stage-selecting env) (cadr env))
 (define (player-pos-in-stage env) (caddr env))
@@ -45,12 +43,11 @@
             ((> (caar p) (caadr p))
              (cons (cadr p) (bubble (cons (car p) (cddr p)))))
             (else (cons (car p) (bubble (cdr p))))))
-    (define (sorting p)
-      (define new-p (bubble p))
-      (if (null? (cdr p))
-          p
-          (cons (car new-p) (sorting (cdr new-p)))))
-    (sorting pair))
+    (define (sorting n result)
+      (if (= n 1)
+          result
+          (sorting (- n 1) (bubble result))))
+    (sorting (length pair) pair))
   (define (edit-env env pair n)
     (cond ((null? env) null)
           ((and (not (null? pair)) (= n (caar pair)))
@@ -67,12 +64,42 @@
   (if (>= n (length l))
       (error "out of range")
       (search-rec l n)))
+(define (take-element2 l2 pos)
+  (take-element (take-element l2 (cdr pos)) (car pos)))
+
+;;test用関数
+(define (select-print env s)
+  (place-image (text (number->string (screen-type env)) 25 "black")
+               (- SCENE-WIDTH 25) (- SCENE-HEIGHT 25) s))
 
 ;;画像のロード
 (define sample-square (bitmap/file "sample-square.bmp"))
 (define sample-frame (bitmap/file "sample-frame.bmp"))
 (define sample-black (bitmap/file "sample-black.bmp"))
 (define frame64 (bitmap/file "frame64.bmp"))
+(define smile (bitmap/file "smile.bmp"))
+(define wall (bitmap/file "iron-barred-block.bmp"))
+(define ground (bitmap/file "green-grass.bmp"))
+
+;;ステージデータ
+(define (init-step-remain map-data) (car map-data))
+(define (init-player-pos map-data) (cadr map-data))
+(define (map-size map-data) (caddr map-data))
+(define (field-data map-data) (cadddr map-data))
+
+(define map-data-tutorial
+  '(10
+    (0 . 0)
+    (8 . 8)
+    ((0 0 0 0 0 0 0 0)
+     (0 w 0 w 0 0 0 0)
+     (0 w 0 w 0 0 0 0)
+     (0 w 0 w w w 0 0)
+     (0 w 0 0 0 w 0 0)
+     (0 w 0 w 0 w 0 0)
+     (w w 0 w 0 w w 0)
+     (0 0 0 0 0 0 0 0))))
+
 
 ;;ステージデータ
 (define (init-step-remain map-data) (car map-data))
@@ -206,6 +233,7 @@
 ;;taisei
 (define (stage-screen env)
 (define map-data
+
     (cond ((= (stage-selecting env) 0) (field-data map-data-tutorial))
           (else (error "out of range :" (stage-selecting env)))))
   (define (map-image-list)
@@ -215,8 +243,9 @@
           (cons
            (cond
              ((and (= (car (player-pos-in-stage env)) (car pos))
-                   (= (cdr (player-pos-in-stage env)) (cdr pos))) sample-square)
-             (else frame64))
+                   (= (cdr (player-pos-in-stage env)) (cdr pos))) smile)
+             ((eq? (car row) 'w) wall)
+             (else ground))
            (make-row (cdr row) (cons (+ (car pos) 1) (cdr pos))))))
     (define (make-col col pos)
       (if (null? col)
@@ -240,11 +269,53 @@
     (place-images (map-image-list)
                   (map-pos-list)
                   SCENE))
-  map-field)
+  
+  (define counter
+    (let ((text (text/font (number->string (car (stage-state-list env)))
+                           128 "black" #f 'modern 'italic 'bold #f)))
+      text))
+  (place-image counter
+               (- SCENE-WIDTH 96)
+               (- SCENE-HEIGHT 64)
+               map-field))
 
 (define (stage-key-event env key)
+  (define action-key "\r")
+  (define count-act (cons (- (car (stage-state-list env)) 1)
+                             (cdr (stage-state-list env))))
+  (define (player-move env dir)
+  (let* ((cur-pos (player-pos-in-stage env))
+         (cur-x (car cur-pos))
+         (cur-y (cdr cur-pos))
+         (map-data map-data-tutorial)
+         (new-pos
+          (cond ((string=? dir "up")
+                 (if (= cur-y 0)
+                     cur-pos
+                     (cons cur-x (- cur-y 1))))
+                ((string=? dir "down")
+                 (if (= cur-y (- (cdr (map-size map-data)) 1))
+                     cur-pos
+                     (cons cur-x (+ cur-y 1))))
+                ((string=? dir "left")
+                 (if (= cur-x 0)
+                     cur-pos
+                     (cons (- cur-x 1) cur-y)))
+                ((string=? dir "right")
+                 (if (= cur-x (- (car (map-size map-data)) 1))
+                     cur-pos
+                     (cons (+ cur-x 1) cur-y))))))
+    (cond ((or (eq? (take-element2 (field-data map-data) new-pos) 'w)
+               (and (= (car cur-pos) (car new-pos))
+                    (= (cdr cur-pos) (cdr new-pos)))) env)
+          (else
+           (edit env
+                 pos new-pos
+                 stage count-act)))))
   (cond ((string=? key "p") (edit env screen 3))
         ((dir? key) (player-move env key))
+        ((string=? key action-key) (edit env stage count-act))
+>>>>>>> f9821f415276b4e4a019c6d649c6062e9be6f9cb
         (else env)))
 
 (define (dir? key)
@@ -252,35 +323,6 @@
       (string=? key "down")
       (string=? key "left")
       (string=? key "right")))
-
-(define (player-move env dir)
-  (let* ((cur-pos (player-pos-in-stage env))
-         (cur-x (car cur-pos))
-         (cur-y (cdr cur-pos))
-         (new-pos
-          (cond ((string=? dir "up")
-                 (cons cur-x
-                       (if (= cur-y 0)
-                           0
-                           (- cur-y 1))))
-                ((string=? dir "down")
-                 (let ((lim (- (cdr (map-size map-data-tutorial)) 1)))
-                   (cons cur-x
-                         (if (= cur-y lim)
-                             lim
-                             (+ cur-y 1)))))
-                ((string=? dir "left")
-                 (cons (if (= cur-x 0)
-                           0
-                           (- cur-x 1))
-                       cur-y))
-                ((string=? dir "right")
-                 (let ((lim (- (car (map-size map-data-tutorial)) 1)))
-                   (cons (if (= cur-x lim)
-                             lim
-                             (+ cur-x 1))
-                         cur-y))))))
-    (edit env pos new-pos)))
 
 (define pause-screen
   SCENE)
@@ -318,53 +360,27 @@
           BOTTON-NEX-Y
           BOTTON-SEL-Y))
     (place-image (rectangle (+ BOTTON-WIDTH (/ BOTTON-WIDTH 8)) (+ BOTTON-HEIGHT (/ BOTTON-WIDTH 8)) "outline" "red") cx y s))
-  (outline-select env (botton-selectstage (botton-nextstage (title-success SCENE)))))
+ 
+        
+  (outline-select env (botton-selectstage (botton-nextstage (title-success
+                                                   ;;test用 (select-print env SCENE)
+                                                             SCENE
+                                                             )))))
 
 (define (success-key-event env key)
- #| (define prev "up")
+  (define prev "up")
   (define next "down")
-  (define do "enter")
-  (cond ((= (car env) 0)
-         (cond
-          ((string=? key do)
-          (list
-           2
-          (+ (stage-selecting env) 1)
-          (player-pos-in-stage env)
-          (stage-state-list env)
-          (pause-state-list env)
-          0
-          0))
-         ((string=? key next)
-          (list
-          (screen-type env)
-          (stage-selecting env)
-          (player-pos-in-stage env)
-          (stage-state-list env)
-          (pause-state-list env)
-          1
-          (cadr (stage-result env))))
-         (else env)))
-        ((= (car env) 1)
-         (cond
-          ((string=? key do)
-          (list
-           1
-          (stage-selecting env)
-          (player-pos-in-stage env)
-          (stage-state-list env)
-          (pause-state-list env)
-          0
-          0))
-         ((string=? key prev)
-          (list
-          (screen-type env)
-          (stage-selecting env)
-          (player-pos-in-stage env)
-          (stage-state-list env)
-          (pause-state-list env)
-          0
-          (cadr (stage-result env))))
-         (else env)))
-  (else env)))|#
-  env);;動作させないための仮置きなのでいずれ消します
+  (define do "\r")
+   (cond ((= (car (stage-result env)) 0)
+         (cond ((string=? key do)
+                (edit env screen 2 select (+ (stage-selecting env) 1) result (list 0)))
+               ((string=? key next)
+                (edit env result (list 1)))
+               (else env)))
+        ((= (car (stage-result env)) 1)
+         (cond ((string=? key do)
+                (edit env screen 1 select 0 result (list 0)))
+               ((string=? key prev)
+                (edit env result (list 0)))
+               (else env)))
+        (else env)))
