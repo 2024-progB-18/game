@@ -208,12 +208,11 @@
      (cond ((> new-env 7) (set! new-env 7))
            ((< new-env 1) (set! new-env 1))
            )
-
-  (edit env select new-env)))
+    (edit env select new-env)))
 
 ;;taisei
 (define (stage-screen env)
- (define map-data
+  (define map-data
     (cond ((= (stage-selecting env) 0) (field-data map-data-tutorial))
           (else (error "out of range :" (stage-selecting env)))))
   (define (map-image-list)
