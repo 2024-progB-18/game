@@ -81,6 +81,7 @@
 (define smile (bitmap/file "smile.bmp"))
 (define wall (bitmap/file "iron-barred-block.bmp"))
 (define ground (bitmap/file "green-grass.bmp"))
+(define blank (bitmap/file "blank-white.bmp"))
 
 ;;ステージデータ
 (define (init-step-remain map-data) (car map-data))
@@ -190,6 +191,7 @@ env)
              ((and (= (car (player-pos-in-stage env)) (car pos))
                    (= (cdr (player-pos-in-stage env)) (cdr pos))) smile)
              ((eq? (car row) 'w) wall)
+             ((eq? (car row) 'b) blank)
              (else ground))
            (make-row (cdr row) (cons (+ (car pos) 1) (cdr pos))))))
     (define (make-col col pos)
@@ -250,6 +252,7 @@ env)
                      cur-pos
                      (cons (+ cur-x 1) cur-y))))))
     (cond ((or (eq? (take-element2 (field-data map-data) new-pos) 'w)
+               (eq? (take-element2 (field-data map-data) new-pos) 'b)
                (and (= (car cur-pos) (car new-pos))
                     (= (cdr cur-pos) (cdr new-pos)))) env)
           (else
