@@ -82,6 +82,7 @@
 (define wall (bitmap/file "iron-barred-block.bmp"))
 (define ground (bitmap/file "green-grass.bmp"))
 (define blank (bitmap/file "blank-white.bmp"))
+(define minus1 (bitmap/file "minus-1.bmp"))
 
 ;;ステージデータ
 (define (init-step-remain map-data) (car map-data))
@@ -93,7 +94,7 @@
   '(10
     (0 . 0)
     (8 . 8)
-    ((0 0 0 0 0 0 0 0)
+    ((0 0 0 0 0 0 0 m)
      (0 w 0 w 0 0 0 0)
      (0 w 0 w 0 0 0 0)
      (0 w 0 w w w 0 0)
@@ -192,6 +193,7 @@ env)
                    (= (cdr (player-pos-in-stage env)) (cdr pos))) smile)
              ((eq? (car row) 'w) wall)
              ((eq? (car row) 'b) blank)
+             ((eq? (car row) 'm) minus1)
              (else ground))
            (make-row (cdr row) (cons (+ (car pos) 1) (cdr pos))))))
     (define (make-col col pos)
@@ -227,8 +229,11 @@ env)
 
 (define (stage-key-event env key)
   (define action-key "\r")
+  (define (dec-remain-act env n)
+    (cons (- (car (stage-state-list env)) n)
+          (cdr (stage-state-list env))))
   (define count-act (cons (- (car (stage-state-list env)) 1)
-                             (cdr (stage-state-list env))))
+                          (cdr (stage-state-list env))))
   (define (player-move env dir)
   (let* ((cur-pos (player-pos-in-stage env))
          (cur-x (car cur-pos))
@@ -255,13 +260,17 @@ env)
                (eq? (take-element2 (field-data map-data) new-pos) 'b)
                (and (= (car cur-pos) (car new-pos))
                     (= (cdr cur-pos) (cdr new-pos)))) env)
+          ((eq? (take-element2 (field-data map-data) new-pos) 'm)
+           (edit env
+                 pos new-pos
+                 stage (dec-remain-act env 2)))
           (else
            (edit env
                  pos new-pos
-                 stage count-act)))))
+                 stage (dec-remain-act env 1))))))
   (cond ((string=? key "p") (edit env screen 3))
         ((dir? key) (player-move env key))
-        ((string=? key action-key) (edit env stage count-act))
+        ((string=? key action-key) (edit env stage (dec-remain-act env 1)))
         (else env)))
 
 (define (dir? key)
