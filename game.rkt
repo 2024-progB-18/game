@@ -123,7 +123,7 @@
 ;;画面表示内容
 (define (display-contents env)
   (cond ((= (screen-type env) 0) start-screen)
-        ((= (screen-type env) 1) selection-screen)
+        ((= (screen-type env) 1) (selection-screen (stage-selecting env)))
         ((= (screen-type env) 2) (stage-screen env))
         ((= (screen-type env) 3) pause-screen)
         ((= (screen-type env) 4) fail-screen)
@@ -160,21 +160,55 @@
           (else env)))
 
 ;;
-(define selection-screen
-  SCENE)
+(define  (selection-screen env)
+  (let ((x1 213)
+  (x2 640)
+  (x3 1067)
+  (y1 256)
+  (y2 384)
+  (y3 512))
+    ;選択地点の描画座標
+    (define xn x2)
+    (define yn y1)
+    (cond ((= env 1) (set! xn x2) (set! yn y1))
+          ((= env 2) (set! xn x1) (set! yn y2))
+          ((= env 3) (set! xn x2) (set! yn y2))
+          ((= env 4) (set! xn x3) (set! yn y2))
+          ((= env 5) (set! xn x1) (set! yn y3))
+          ((= env 6) (set! xn x2) (set! yn y3))
+          ((= env 7) (set! xn x3) (set! yn y3)))
+    
+    (place-image (text "stage 0" 64 "black")
+                 x2 y1
+                 (place-image (text "stage 1" 64 "black")
+                              x1 y2
+                              (place-image (text "stage 2" 64 "black")
+                                           x2 y2
+                                           (place-image (text "stage 3" 64 "black")
+                                                        x3 y2                                           
+                                                        (place-image (text "stage 4" 64 "black")
+                                                                     x1 y3                                                              
+                                                                     (place-image (text "stage 5" 64 "black")
+                                                                                  x2 y3
+                                                                                  (place-image (text "stage 6" 64 "black")
+                                                                                               x3 y3
+                                                                                        (place-image (circle 30 "solid" "black")
+                                                                                                     (- xn 150)
+                                                                                                     yn
+                                                                                       SCENE ))))))))))
 
-(define (selection-key-event env key);hayato
-  #|
-  (define(decision-stage)
-   (cond
-       ((= select 1)(1st-stage))
-       ((= select 2)(2nd-stage))
-       ((= select 3)(3rd-stage))
-       ((= secect 4)(4th-stage))
-       ((= secect 5)(5th-stage))
-       ((= secect 6)(6th-stage))))
-  |#
-env)
+
+ (define (selection-key-event env key);hayato
+   (let ((new-env (cond ((string=? key "right") (+ (stage-selecting env) 1))
+                         ((string=? key "left") (- (stage-selecting env) 1))
+                         ((string=? key "up") (- (stage-selecting env) 3))
+                         ((string=? key "down") (+ (stage-selecting env) 3))
+                         (else (car (stage-selecting env))))))
+  ;ステージ1を選択中左を押されたら6に移動
+     (cond ((> new-env 7) (set! new-env 7))
+           ((< new-env 1) (set! new-env 1))
+           )
+    (edit env select new-env)))
 
 ;;taisei
 (define (stage-screen env)
