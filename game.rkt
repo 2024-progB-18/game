@@ -112,43 +112,43 @@
   '(20
     (0 . 0)
     (6 . 5)
-    ((0 0 0 w 0 w)
+    ((0 0 0 w k w)
      (w 0 0 w 0 w)
      (g w 0 0 o 0)
      (0 0 w 0 0 b)
-     (0 o 0 0 0 b))))
+     (0 o 0 L 0 b))))
 (define map-data-1
   '(99
     (0 . 0)
     (2 . 2)
     ((0 0)
-     (0 0))))
+     (0 g))))
 (define map-data-2
   '(99
     (0 . 0)
     (2 . 2)
     ((0 0)
-     (0 0))))
+     (0 g))))
 (define map-data-3
   '(99
     (0 . 0)
     (2 . 2)
     ((0 0)
-     (0 0))))
+     (0 g))))
 (define map-data-4
   '(99
     (0 . 0)
     (2 . 2)
     ((0 0)
-     (0 0))))
+     (0 g))))
 (define map-data-5
   '(99
     (0 . 0)
     (2 . 2)
     ((0 0)
-     (0 0))))
+     (0 g))))
 (define map-data-6
-  '(10
+  '(99
     (0 . 0)
     (12 . 12)
     ((0 0 0 0 0 0 0 - 0 0 0 0)
@@ -279,7 +279,7 @@
 
 ;;taisei
 (define (stage-screen env)
-  (define map-data (cadr (stage-state-list env)))
+  (define map-data (caddr (stage-state-list env)))
   (define (map-image-list)
     (define (make-row row pos)
       (if (null? row)
@@ -334,7 +334,8 @@
   (define (dec-remain-act env n)
     (cons (- (car (stage-state-list env)) n)
           (cdr (stage-state-list env))))
-  (define field-data (cadr (stage-state-list env)))
+  (define key-count (cadr (stage-state-list env)))
+  (define field-data (caddr (stage-state-list env)))
   (define mapsize
     (let ((stage (stage-selecting env)))
       (cond ((= stage 0) (map-size map-data-tutorial))
@@ -385,11 +386,26 @@
            (if (eq? (take-element2 field-data next-pos) 0)
                (edit env
                      stage (list (car (dec-remain-act env 1))
+                                 key-count
                                  (change-element2
                                   (change-element2 field-data new-pos 0)
                                   next-pos 'o)))
                env))
           ((eq? gimmick 'g) (edit env screen 5))
+          ((eq? gimmick 'k)
+           (edit env
+                 pos new-pos
+                 stage (list (car (dec-remain-act env 1))
+                             (+ key-count 1)
+                             (change-element2 field-data new-pos 0))))
+          ((eq? gimmick 'L)
+           (if (zero? key-count)
+               env
+               (edit env
+                     pos new-pos
+                     stage (list (car (dec-remain-act env 1))
+                                 (- key-count 1)
+                                 (change-element2 field-data new-pos 'U)))))
           (else
            (edit env
                  pos new-pos
@@ -412,6 +428,7 @@
   (edit env
         pos (init-player-pos map-data)
         stage (list (init-step-remain map-data)
+                    0
                     (field-data map-data))))
 
 (define (dir? key)
