@@ -109,21 +109,14 @@
 (define (field-data map-data) (cadddr map-data))
 
 (define map-data-tutorial
-  '(10
+  '(20
     (0 . 0)
-    (12 . 12)
-    ((0 0 0 0 0 0 0 - 0 0 0 0)
-     (0 w 0 w 0 0 o 0 0 0 0 0)
-     (0 w 0 w 0 0 0 0 0 0 0 0)
-     (0 w 0 w w w 0 0 0 0 0 0)
-     (0 w 0 l 0 w 0 0 0 0 0 0)
-     (0 w 0 w 0 w 0 0 0 0 0 0)
-     (w w d w 0 w w 0 0 0 0 0)
-     (0 0 0 r u 0 0 0 0 0 0 0)
-     (0 0 0 w w w 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0 0 0 0 g))))
+    (6 . 5)
+    ((0 0 0 w 0 w)
+     (w 0 0 w 0 w)
+     (g w 0 0 o 0)
+     (0 0 w 0 0 b)
+     (0 o 0 0 0 b))))
 (define map-data-1
   '(99
     (0 . 0)
@@ -155,11 +148,21 @@
     ((0 0)
      (0 0))))
 (define map-data-6
-  '(99
+  '(10
     (0 . 0)
-    (2 . 2)
-    ((0 0)
-     (0 0))))
+    (12 . 12)
+    ((0 0 0 0 0 0 0 - 0 0 0 0)
+     (0 w 0 w 0 0 o 0 0 0 0 0)
+     (0 w 0 w 0 0 0 0 0 0 0 0)
+     (0 w 0 w w w 0 0 0 0 0 0)
+     (0 w 0 l 0 w 0 0 0 0 0 0)
+     (0 w 0 w 0 w 0 0 0 0 0 0)
+     (w w d w 0 w w 0 0 0 0 0)
+     (0 0 0 r u 0 0 0 0 0 0 0)
+     (0 0 0 w w w 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0 0 0 0 g))))
 
 ;;ゲームスタート
 (define demo "demo")
@@ -392,6 +395,7 @@
                  pos new-pos
                  stage (dec-remain-act env 1)))))
   (cond ((string=? key "p") (edit env screen 3))
+        ((string=? key "r") (init-stage env))
         ((dir? key) (player-move env key))
         (else env)))
 
