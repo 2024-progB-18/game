@@ -221,21 +221,21 @@
 ;;
 (define  (selection-screen env)
   (let ((x1 213)
-  (x2 640)
-  (x3 1067)
-  (y1 256)
-  (y2 384)
-  (y3 512))
+        (x2 640)
+        (x3 1067)
+        (y1 256)
+        (y2 384)
+        (y3 512))
     ;選択地点の描画座標
     (define xn x2)
     (define yn y1)
-    (cond ((= env 1) (set! xn x2) (set! yn y1))
-          ((= env 2) (set! xn x1) (set! yn y2))
-          ((= env 3) (set! xn x2) (set! yn y2))
-          ((= env 4) (set! xn x3) (set! yn y2))
-          ((= env 5) (set! xn x1) (set! yn y3))
-          ((= env 6) (set! xn x2) (set! yn y3))
-          ((= env 7) (set! xn x3) (set! yn y3)))
+    (cond ((= env 0) (set! xn x2) (set! yn y1))
+          ((= env 1) (set! xn x1) (set! yn y2))
+          ((= env 2) (set! xn x2) (set! yn y2))
+          ((= env 3) (set! xn x3) (set! yn y2))
+          ((= env 4) (set! xn x1) (set! yn y3))
+          ((= env 5) (set! xn x2) (set! yn y3))
+          ((= env 6) (set! xn x3) (set! yn y3)))
     
     (place-image (text "stage 0" 64 "black")
                  x2 y1
@@ -251,23 +251,28 @@
                                                                                   x2 y3
                                                                                   (place-image (text "stage 6" 64 "black")
                                                                                                x3 y3
-                                                                                        (place-image (circle 30 "solid" "black")
-                                                                                                     (- xn 150)
-                                                                                                     yn
-                                                                                       SCENE ))))))))))
+                                                                                               (place-image (circle 30 "solid" "black")
+                                                                                                            (- xn 150)
+                                                                                                            yn
+                                                                                                            SCENE ))))))))))
 
 
- (define (selection-key-event env key);hayato
-   (let ((new-env (cond ((string=? key "right") (+ (stage-selecting env) 1))
-                         ((string=? key "left") (- (stage-selecting env) 1))
-                         ((string=? key "up") (- (stage-selecting env) 3))
-                         ((string=? key "down") (+ (stage-selecting env) 3))
-                         (else (car (stage-selecting env))))))
-  ;ステージ1を選択中左を押されたら6に移動
-     (cond ((> new-env 7) (set! new-env 7))
-           ((< new-env 1) (set! new-env 1))
-           )
-    (edit env select new-env)))
+(define (selection-key-event env key);hayato
+  (let ((new-env (cond ((string=? key "right") (+ (stage-selecting env) 1))
+                       ((string=? key "left") (- (stage-selecting env) 1))
+                       ((string=? key "up") (- (stage-selecting env) 3))
+                       ((string=? key "down") (if (= (stage-selecting env) 0)
+                                                  1
+                                                  (+ (stage-selecting env) 3)))
+                       (else (stage-selecting env)))))
+    ;ステージ1を選択中左を押されたら6に移動
+    (cond ((> new-env 6) (set! new-env 6))
+          ((< new-env 0) (set! new-env 0))
+          )
+    (cond ((dir? key) (edit env select new-env))
+          ((string=? key "\r")
+           (init-stage (edit env screen 2 select new-env)))
+          (else env))))
 
 ;;taisei
 (define (stage-screen env)
@@ -381,7 +386,7 @@
                                   (change-element2 field-data new-pos 0)
                                   next-pos 'o)))
                env))
-          ((eq?　gimmick 'g) (edit env screen 5))
+          ((eq? gimmick 'g) (edit env screen 5))
           (else
            (edit env
                  pos new-pos
@@ -458,7 +463,11 @@
   (define do "\r")
    (cond ((= (car (stage-result env)) 0)
          (cond ((string=? key do)
-                (edit env screen 2 select (+ (stage-selecting env) 1) result (list 0)))
+                (init-stage
+                 (edit env
+                       screen 2
+                       select (+ (stage-selecting env) 1)
+                       result (list 0))))
                ((string=? key next)
                 (edit env result (list 1)))
                (else env)))
