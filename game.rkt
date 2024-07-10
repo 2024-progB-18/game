@@ -100,6 +100,7 @@
 (define lower-lim (bitmap/file "lower-lim.bmp"))
 (define right-lim (bitmap/file "right-lim.bmp"))
 (define left-lim (bitmap/file "left-lim.bmp"))
+(define goal (bitmap/file "goal-flag.bmp"))
 
 ;;ステージデータ
 (define (init-step-remain map-data) (car map-data))
@@ -122,7 +123,7 @@
      (0 0 0 w w w 0 0 0 0 0 0)
      (0 0 0 0 0 0 0 0 0 0 0 0)
      (0 0 0 0 0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0 0 0 0 0))))
+     (0 0 0 0 0 0 0 0 0 0 0 g))))
 (define map-data-1
   '(99
     (0 . 0)
@@ -287,6 +288,7 @@
              ((eq? (car row) 'd) lower-lim)
              ((eq? (car row) 'r) right-lim)
              ((eq? (car row) 'l) left-lim)
+             ((eq? (car row) 'g) goal)
              (else ground))
            (make-row (cdr row) (cons (+ (car pos) 1) (cdr pos))))))
     (define (make-col col pos)
@@ -379,6 +381,7 @@
                                   (change-element2 field-data new-pos 0)
                                   next-pos 'o)))
                env))
+          ((eq?　gimmick 'g) (edit env screen 5))
           (else
            (edit env
                  pos new-pos
