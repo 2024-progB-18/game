@@ -96,6 +96,10 @@
 (define blank (bitmap/file "blank-white.bmp"))
 (define minus1 (bitmap/file "minus-1.bmp"))
 (define pushobject (bitmap/file "wooden-box.bmp"))
+(define upper-lim (bitmap/file "upper-lim.bmp"))
+(define lower-lim (bitmap/file "lower-lim.bmp"))
+(define right-lim (bitmap/file "right-lim.bmp"))
+(define left-lim (bitmap/file "left-lim.bmp"))
 
 ;;ステージデータ
 (define (init-step-remain map-data) (car map-data))
@@ -106,15 +110,19 @@
 (define map-data-tutorial
   '(10
     (0 . 0)
-    (8 . 8)
-    ((0 0 0 0 0 0 0 m)
-     (0 w 0 w 0 0 o 0)
-     (0 w 0 w 0 0 0 0)
-     (0 w 0 w w w 0 0)
-     (0 w 0 0 0 w 0 0)
-     (0 w 0 w 0 w 0 0)
-     (w w 0 w 0 w w 0)
-     (0 0 0 0 0 0 0 0))))
+    (12 . 12)
+    ((0 0 0 0 0 0 0 - 0 0 0 0)
+     (0 w 0 w 0 0 o 0 0 0 0 0)
+     (0 w 0 w 0 0 0 0 0 0 0 0)
+     (0 w 0 w w w 0 0 0 0 0 0)
+     (0 w 0 l 0 w 0 0 0 0 0 0)
+     (0 w 0 w 0 w 0 0 0 0 0 0)
+     (w w d w 0 w w 0 0 0 0 0)
+     (0 0 0 r u 0 0 0 0 0 0 0)
+     (0 0 0 w w w 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0 0 0 0 0)
+     (0 0 0 0 0 0 0 0 0 0 0 0))))
 (define map-data-1
   '(99
     (0 . 0)
@@ -273,8 +281,12 @@
                    (= (cdr (player-pos-in-stage env)) (cdr pos))) smile)
              ((eq? (car row) 'w) wall)
              ((eq? (car row) 'b) blank)
-             ((eq? (car row) 'm) minus1)
+             ((eq? (car row) '-) minus1)
              ((eq? (car row) 'o) pushobject)
+             ((eq? (car row) 'u) upper-lim)
+             ((eq? (car row) 'd) lower-lim)
+             ((eq? (car row) 'r) right-lim)
+             ((eq? (car row) 'l) left-lim)
              (else ground))
            (make-row (cdr row) (cons (+ (car pos) 1) (cdr pos))))))
     (define (make-col col pos)
@@ -323,48 +335,54 @@
             ((= stage 5) (map-size map-data-5))
             ((= stage 6) (map-size map-data-6)))))
   (define (player-move env dir)
-    (let* ((cur-pos (player-pos-in-stage env)))
-      (define (update-pos pos)
-        (define x (car pos))
-        (define y (cdr pos))
-        (cond ((string=? dir "up")
-               (if (= y 0)
-                   pos
-                   (cons x (- y 1))))
-              ((string=? dir "down")
-               (if (= y (- (cdr mapsize) 1))
-                   pos
-                   (cons x (+ y 1))))
-              ((string=? dir "left")
-               (if (= x 0)
-                   pos
-                   (cons (- x 1) y)))
-              ((string=? dir "right")
-               (if (= x (- (car mapsize) 1))
-                   pos
-                   (cons (+ x 1) y)))))
-      (define new-pos (update-pos cur-pos))
-      (cond ((or (eq? (take-element2 field-data new-pos) 'w)
-                 (eq? (take-element2 field-data new-pos) 'b)
-                 (and (= (car cur-pos) (car new-pos))
-                      (= (cdr cur-pos) (cdr new-pos)))) env)
-            ((eq? (take-element2 field-data new-pos) 'm)
-             (edit env
-                   pos new-pos
-                   stage (dec-remain-act env 2)))
-            ((eq? (take-element2 field-data new-pos) 'o)
-             (define next-pos (update-pos new-pos))
-             (if (eq? (take-element2 field-data next-pos) 0)
-                 (edit env
-                       stage (list (car (dec-remain-act env 1))
-                                   (change-element2
-                                    (change-element2 field-data new-pos 0)
-                                    next-pos 'o)))
-                 env))
-            (else
-             (edit env
-                   pos new-pos
-                   stage (dec-remain-act env 1))))))
+    (define cur-pos (player-pos-in-stage env))
+    (define (update-pos pos)
+      (define x (car pos))
+      (define y (cdr pos))
+      (cond ((string=? dir "up")
+             (if (= y 0)
+                 pos
+                 (cons x (- y 1))))
+            ((string=? dir "down")
+             (if (= y (- (cdr mapsize) 1))
+                 pos
+                 (cons x (+ y 1))))
+            ((string=? dir "left")
+             (if (= x 0)
+                 pos
+                 (cons (- x 1) y)))
+            ((string=? dir "right")
+             (if (= x (- (car mapsize) 1))
+                 pos
+                 (cons (+ x 1) y)))))
+    (define new-pos (update-pos cur-pos))
+    (define gimmick (take-element2 field-data new-pos))
+    (cond ((or (eq? gimmick 'w)
+               (eq? gimmick 'b)
+               (and (= (car cur-pos) (car new-pos))
+                    (= (cdr cur-pos) (cdr new-pos)))
+               (and (eq? gimmick 'u) (string=? dir "down"))
+               (and (eq? gimmick 'd) (string=? dir "up"))
+               (and (eq? gimmick 'l) (string=? dir "right"))
+               (and (eq? gimmick 'r) (string=? dir "left")))
+           env)
+          ((eq? gimmick '-)
+           (edit env
+                 pos new-pos
+                 stage (dec-remain-act env 2)))
+          ((eq? gimmick 'o)
+           (define next-pos (update-pos new-pos))
+           (if (eq? (take-element2 field-data next-pos) 0)
+               (edit env
+                     stage (list (car (dec-remain-act env 1))
+                                 (change-element2
+                                  (change-element2 field-data new-pos 0)
+                                  next-pos 'o)))
+               env))
+          (else
+           (edit env
+                 pos new-pos
+                 stage (dec-remain-act env 1)))))
   (cond ((string=? key "p") (edit env screen 3))
         ((dir? key) (player-move env key))
         (else env)))
