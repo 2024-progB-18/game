@@ -93,14 +93,13 @@
 (define smile (bitmap/file "smile.bmp"))
 (define wall (bitmap/file "iron-barred-block.bmp"))
 (define ground (bitmap/file "green-grass.bmp"))
-(define blank (bitmap/file "blank-white.bmp"))
 (define minus1 (bitmap/file "minus-1.bmp"))
 (define pushobject (bitmap/file "wooden-box.bmp"))
-(define upper-lim (bitmap/file "upper-lim.bmp"))
-(define lower-lim (bitmap/file "lower-lim.bmp"))
-(define right-lim (bitmap/file "right-lim.bmp"))
-(define left-lim (bitmap/file "left-lim.bmp"))
+(define limit (bitmap/file "limit.png"))
 (define goal (bitmap/file "goal-flag.bmp"))
+(define key (bitmap/file "key.png"))
+(define lock (bitmap/file "lock.png"))
+(define unlock (bitmap/file "unlock.png"))
 
 ;;ステージデータ
 (define (init-step-remain map-data) (car map-data))
@@ -112,43 +111,43 @@
   '(20
     (0 . 0)
     (6 . 5)
-    ((0 0 0 w 0 w)
+    ((0 0 0 w k w)
      (w 0 0 w 0 w)
      (g w 0 0 o 0)
      (0 0 w 0 0 b)
-     (0 o 0 0 0 b))))
+     (0 o 0 L 0 b))))
 (define map-data-1
   '(99
     (0 . 0)
     (2 . 2)
     ((0 0)
-     (0 0))))
+     (0 g))))
 (define map-data-2
   '(99
     (0 . 0)
     (2 . 2)
     ((0 0)
-     (0 0))))
+     (0 g))))
 (define map-data-3
   '(99
     (0 . 0)
     (2 . 2)
     ((0 0)
-     (0 0))))
+     (0 g))))
 (define map-data-4
   '(99
     (0 . 0)
     (2 . 2)
     ((0 0)
-     (0 0))))
+     (0 g))))
 (define map-data-5
   '(99
     (0 . 0)
     (2 . 2)
     ((0 0)
-     (0 0))))
+     (0 g))))
 (define map-data-6
-  '(10
+  '(99
     (0 . 0)
     (12 . 12)
     ((0 0 0 0 0 0 0 - 0 0 0 0)
@@ -279,7 +278,7 @@
 
 ;;taisei
 (define (stage-screen env)
-  (define map-data (cadr (stage-state-list env)))
+  (define map-data (caddr (stage-state-list env)))
   (define (map-image-list)
     (define (make-row row pos)
       (if (null? row)
@@ -289,14 +288,17 @@
              ((and (= (car (player-pos-in-stage env)) (car pos))
                    (= (cdr (player-pos-in-stage env)) (cdr pos))) smile)
              ((eq? (car row) 'w) wall)
-             ((eq? (car row) 'b) blank)
+             ((eq? (car row) 'b) empty-image)
              ((eq? (car row) '-) minus1)
              ((eq? (car row) 'o) pushobject)
-             ((eq? (car row) 'u) upper-lim)
-             ((eq? (car row) 'd) lower-lim)
-             ((eq? (car row) 'r) right-lim)
-             ((eq? (car row) 'l) left-lim)
+             ((eq? (car row) 'u) (place-image limit 32 32 ground))
+             ((eq? (car row) 'd) (place-image (rotate 180 limit) 32 32 ground))
+             ((eq? (car row) 'r) (place-image (rotate 270 limit) 32 32 ground))
+             ((eq? (car row) 'l) (place-image (rotate 90 limit) 32 32 ground))
              ((eq? (car row) 'g) goal)
+             ((eq? (car row) 'k) (place-image key 32 32 ground))
+             ((eq? (car row) 'L) lock)
+             ((eq? (car row) 'U) (place-image unlock 32 32 ground)) 
              (else ground))
            (make-row (cdr row) (cons (+ (car pos) 1) (cdr pos))))))
     (define (make-col col pos)
@@ -321,20 +323,35 @@
     (place-images (map-image-list)
                   (map-pos-list)
                   SCENE))
-  (define counter
-    (let ((text (text/font (number->string (car (stage-state-list env)))
-                           128 "black" #f 'modern 'italic 'bold #f)))
-      text))
-  (place-image counter
-               (- SCENE-WIDTH 96)
-               (- SCENE-HEIGHT 64)
-               map-field))
+  (define (add-step-counter image)
+    (define text
+      (text/font (number->string (car (stage-state-list env)))
+                 128 "black" #f 'modern 'italic 'bold #f))
+    (place-image text
+                 (- SCENE-WIDTH 96)
+                 (- SCENE-HEIGHT 64)
+                 image))
+  (define (add-key-counter image)
+    (let ((key-count
+           (text/font (number->string (cadr (stage-state-list env)))
+                      64 "black" #f 'modern 'normal 'bold #f)))
+      (place-image key-count
+                   (- SCENE-WIDTH 32)
+                   (- SCENE-HEIGHT 160)
+                   (place-image key
+                                (- SCENE-WIDTH 72)
+                                (- SCENE-HEIGHT 160)
+                                image))))
+  (if (zero? (cadr (stage-state-list env)))
+      (add-step-counter map-field)
+      (add-key-counter (add-step-counter map-field))))
 
 (define (stage-key-event env key)
   (define (dec-remain-act env n)
     (cons (- (car (stage-state-list env)) n)
           (cdr (stage-state-list env))))
-  (define field-data (cadr (stage-state-list env)))
+  (define key-count (cadr (stage-state-list env)))
+  (define field-data (caddr (stage-state-list env)))
   (define mapsize
     (let ((stage (stage-selecting env)))
       (cond ((= stage 0) (map-size map-data-tutorial))
@@ -385,11 +402,26 @@
            (if (eq? (take-element2 field-data next-pos) 0)
                (edit env
                      stage (list (car (dec-remain-act env 1))
+                                 key-count
                                  (change-element2
                                   (change-element2 field-data new-pos 0)
                                   next-pos 'o)))
                env))
           ((eq? gimmick 'g) (edit env screen 5))
+          ((eq? gimmick 'k)
+           (edit env
+                 pos new-pos
+                 stage (list (car (dec-remain-act env 1))
+                             (+ key-count 1)
+                             (change-element2 field-data new-pos 0))))
+          ((eq? gimmick 'L)
+           (if (zero? key-count)
+               env
+               (edit env
+                     pos new-pos
+                     stage (list (car (dec-remain-act env 1))
+                                 (- key-count 1)
+                                 (change-element2 field-data new-pos 'U)))))
           (else
            (edit env
                  pos new-pos
@@ -412,6 +444,7 @@
   (edit env
         pos (init-player-pos map-data)
         stage (list (init-step-remain map-data)
+                    0
                     (field-data map-data))))
 
 (define (dir? key)
