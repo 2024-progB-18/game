@@ -1,11 +1,12 @@
+
 #lang racket
 (require "reactor-lib.rkt")
 (require 2htdp/image)
 (require 2htdp/universe)
 
 ;;背景(外枠)スクリーンの定義
-(define SCENE-WIDTH 1920)
-(define SCENE-HEIGHT 1024)
+(define SCENE-WIDTH 1280)
+(define SCENE-HEIGHT 768);;定義を変えてしまった
 (define SCENE (empty-scene SCENE-WIDTH SCENE-HEIGHT "white"))
 
 ;;１マスの大きさ
@@ -17,7 +18,7 @@
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
-  (list 0 0 (cons 0 0) (list null) (list 1) (list null)))
+  (list 0 0 (cons 0 0) (list null) (list 1 380) (list null)))
 (define (screen-type env) (car env))
 (define (stage-selecting env) (cadr env))
 (define (player-pos-in-stage env) (caddr env))
@@ -64,7 +65,7 @@
   (cond ((= (screen-type env) 0) start-screen)
         ((= (screen-type env) 1) selection-screen)
         ((= (screen-type env) 2) stage-screen)
-        ((= (screen-type env) 3) pause-screen)
+        ((= (screen-type env) 3) (pause-screen env))
         ((= (screen-type env) 4) fail-screen)
         ((= (screen-type env) 5) success-screen)
         (else (error "wrong enviroment"))))
@@ -97,14 +98,14 @@
   SCENE)
 
 (define (selection-key-event env key);hayato
-  (define(decision-stage)
-   (cond
-       ((= select 1)(1st-stage))
-       ((= select 2)(2nd-stage))
-       ((= select 3)(3rd-stage))
-       ((= secect 4)(4th-stage))
-       ((= secect 5)(5th-stage))
-       ((= secect 6)(6th-stage))))
+  ;; (define(decision-stage)
+  ;;  (cond
+  ;;      ((= select 1)(1st-stage))
+  ;;      ((= select 2)(2nd-stage))
+  ;;      ((= select 3)(3rd-stage))
+  ;;      ((= secect 4)(4th-stage))
+  ;;      ((= secect 5)(5th-stage))
+  ;;      ((= secect 6)(6th-stage))))
   env)
 ;;
 (define stage-screen
@@ -141,51 +142,38 @@
           (pause-state-list env)
           (stage-result env))))
 
-(define pause-screen;;上野智ですよ
-  SCENE)
+
+;;(define ME (text "<<                                   >>" 40 "white"));;プレイヤーのカーソル
+
+
+(define (pause-screen env);;上野
+  (define me-y (cadr (pause-state-list env)))
+  ;;(define draw-screen
+               (place-image (text "PAUSE" 100 "white")
+                           640
+                           120
+  (place-image (text "<1> CLOSE" 40 "white")
+               640
+               330
+               (place-image (text "<2> STAGE-SELECT" 40 "white")
+                            640
+                            380
+                            (place-image (text "<3> RESTART" 40 "white")
+                                         640
+                                         430
+                                         (empty-scene SCENE-WIDTH SCENE-HEIGHT "black"))))))
 
 (define (pause-key-event env key)
-  (cond ((string=? key "up");;一つ上に移動
-           (list (screen-type env)
-                 (stage-selecting env)
-                 (player-move env)
-                 (stage-state-list env)
-                 (list (+ 1 (car (pause-state-list env))))
-                 (stage-result env)))
+  (define me-y (cadr (pause-state-list env)))
+  (cond ((string=? key "1");;1を押したらpausemenuを閉じる
+          (edit env screen 2))
         
-           ((string=? key "down");;一つ下に移動
-            (list (screen-type env)
-                  (stage-selecting env)
-                  (player-move env)
-                  (stage-state-list env)
-                  (list (- (car (pause-state-list env)) 1))
-                  (stage-state-list env)))
+          ((string=? key "2");;2を押したらstage-selectへ
+            (edit env screen 1 pos (cons 0 0)))
            
-        ((string=? key "enter")
-           (cond ((= (car (pause-state-list env)) 1)
-                  (list (screen-type env)
-                        0
-                        (player-move env)
-                        (stage-state-list env)
-                        (pause-state-list env)
-                        (stage-result env)));;真ん中にいるときstage-slectへ
-                 
-                 ((= (list (car (pause-state-list env))) 2)
-                   ((= (screen-type env) 2)));;上にいるときpausemenuを閉じる
-                 
-                 ((= (list (car (pause-state-list env))) 0)
-                  (list (screen-type env)
-                        ((stage-selecting env) 
-                        ((cons 0 0))
-                        (stage-state-list env)
-                        (pause-state-list env)
-                        (stage-result env)));;下にいるときRestart,キャラを初期位置に戻す。行動回数のリセット。
-
-                  ((or (< (list (car (pause-state-list env))) 0)
-                       (> (list (car (pause-state-list env))) 2))
-                   env);;pausemenuのボタンの範囲外に行かないようにする。
-                 )))
-        (else env)))
+       ((string=? key "3");;3を押したらRESTART
+            (edit env pos (cons 0 0)));;キャラを初期位置に戻す。行動回数のリセット。
+       (else env)))
    
 
 ;;
