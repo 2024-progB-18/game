@@ -6,8 +6,8 @@
 (require lang/posn)
 
 ;;背景(外枠)スクリーンの定義
-(define SCENE-WIDTH 1280);;大きさが合わなかったので変えました
-(define SCENE-HEIGHT 768);;14インチの画面だとタスクバー抜きでの適正サイズはこれくらいになりそうです
+(define SCENE-WIDTH 1280)
+(define SCENE-HEIGHT 768)
 (define SCENE (empty-scene SCENE-WIDTH SCENE-HEIGHT "white"))
 
 ;;１マスの大きさ
@@ -107,12 +107,17 @@
 
 ;;ステージデータ
 (define (init-step-remain map-data) (car map-data))
-(define (init-player-pos map-data) (cadr map-data))
-(define (map-size map-data) (caddr map-data))
-(define (field-data map-data) (cadddr map-data))
+(define (init-key-count map-data) (cadr map-data))
+(define (init-player-pos map-data) (caddr map-data))
+(define (map-size map-data) (cadddr map-data))
+(define (field-data map-data) (car (cddddr map-data)))
+
+;中央揃えにするかどうか（決まったら消す）
+(define centered true)
 
 (define map-data-tutorial
   '(20
+    0
     (0 . 0)
     (6 . 5)
     ((0 0 0 w k w)
@@ -122,36 +127,49 @@
      (0 o 0 L 0 b))))
 (define map-data-1
   '(99
+    0
     (0 . 0)
     (2 . 2)
     ((0 0)
      (0 g))))
 (define map-data-2
   '(99
+    0
     (0 . 0)
     (2 . 2)
     ((0 0)
      (0 g))))
 (define map-data-3
   '(99
+    0
     (0 . 0)
     (2 . 2)
     ((0 0)
      (0 g))))
 (define map-data-4
   '(99
+    0
     (0 . 0)
     (2 . 2)
     ((0 0)
      (0 g))))
 (define map-data-5
   '(99
+    0
     (0 . 0)
     (2 . 2)
     ((0 0)
      (0 g))))
 (define map-data-6
   '(99
+    0
+    (0 . 0)
+    (2 . 2)
+    ((0 0)
+     (0 g))))
+(define map-data-test
+  '(99
+    0
     (0 . 0)
     (12 . 12)
     ((0 0 0 0 0 0 0 - 0 0 0 0)
@@ -192,7 +210,7 @@
         ((= (screen-type env) 2) (stage-screen env))
         ((= (screen-type env) 3) pause-screen)
         ((= (screen-type env) 4) fail-screen)
-        ((= (screen-type env) 5) (success-screen env)) ;;描画に環境変数が必要なため変えてます
+        ((= (screen-type env) 5) (success-screen env))
         (else (error "wrong enviroment"))))
 
 ;;キーボード入力で発火
@@ -278,11 +296,15 @@
     (cond ((dir? key) (edit env select new-env))
           ((string=? key "\r")
            (init-stage (edit env screen 2 select new-env)))
+          ((string=? key "t")
+           (init-stage (edit env screen 2 select -1)))
           (else env))))
 
 ;;taisei
 (define (stage-screen env)
-  (define map-data (caddr (stage-state-list env)))
+  (define field-width (* (caaddr (stage-state-list env)) SQUARE))
+  (define field-height (* (cdaddr (stage-state-list env)) SQUARE))
+  (define field-data (cadddr (stage-state-list env)))
   (define (map-image-list)
     (define (make-row row pos)
       (if (null? row)
@@ -309,7 +331,7 @@
           '()
           (append (make-row (car col) (cons 0 pos))
                   (make-col (cdr col) (+ pos 1)))))
-    (make-col map-data 0))
+    (make-col field-data 0))
   (define (map-pos-list)
     (define (make-row row x y)
       (if (null? row)
@@ -319,9 +341,16 @@
     (define (make-col col y)
       (if (null? col)
           '()
-          (append (make-row (car col) 32 y)
+          (append (make-row (car col)
+                            (if centered
+                                (/ (+ (- SCENE-WIDTH field-width) SQUARE) 2)
+                                (/ SQUARE 2))
+                            y)
                   (make-col (cdr col) (+ y SQUARE)))))
-    (make-col map-data 32))
+    (make-col field-data
+              (if centered
+                  (/ (+ (- SCENE-HEIGHT field-height) SQUARE) 2)
+                  (/ SQUARE 2))))
   (define map-field
     (place-images (map-image-list)
                   (map-pos-list)
@@ -350,20 +379,11 @@
       (add-key-counter (add-step-counter map-field))))
 
 (define (stage-key-event env key)
-  (define (dec-remain-act env n)
-    (cons (- (car (stage-state-list env)) n)
-          (cdr (stage-state-list env))))
-  (define key-count (cadr (stage-state-list env)))
-  (define field-data (caddr (stage-state-list env)))
-  (define mapsize
-    (let ((stage (stage-selecting env)))
-      (cond ((= stage 0) (map-size map-data-tutorial))
-            ((= stage 1) (map-size map-data-1))
-            ((= stage 2) (map-size map-data-2))
-            ((= stage 3) (map-size map-data-3))
-            ((= stage 4) (map-size map-data-4))
-            ((= stage 5) (map-size map-data-5))
-            ((= stage 6) (map-size map-data-6)))))
+  (define stage-env (stage-state-list env))
+  (define (dec-remain-act n) (- (car stage-env) n))
+  (define key-count (cadr stage-env))
+  (define mapsize (caddr stage-env))
+  (define field-data (cadddr stage-env))
   (define (player-move env dir)
     (define cur-pos (player-pos-in-stage env))
     (define (update-pos pos)
@@ -398,36 +418,38 @@
           ((eq? gimmick '-)
            (edit env
                  pos new-pos
-                 stage (dec-remain-act env 2)))
+                 stage (edit stage-env 0 (dec-remain-act 2))))
           ((eq? gimmick 'o)
            (define next-pos (update-pos new-pos))
            (if (eq? (take-element2 field-data next-pos) 0)
                (edit env
-                     stage (list (car (dec-remain-act env 1))
-                                 key-count
-                                 (change-element2
-                                  (change-element2 field-data new-pos 0)
-                                  next-pos 'o)))
+                     stage (edit stage-env
+                                 0 (dec-remain-act 2)
+                                 3 (change-element2
+                                    (change-element2 field-data new-pos 0)
+                                    next-pos 'o)))
                env))
           ((eq? gimmick 'g) (edit env screen 5))
           ((eq? gimmick 'k)
            (edit env
                  pos new-pos
-                 stage (list (car (dec-remain-act env 1))
-                             (+ key-count 1)
-                             (change-element2 field-data new-pos 0))))
+                 stage (edit stage-env
+                             0 (dec-remain-act 1)
+                             1 (+ key-count 1)
+                             3 (change-element2 field-data new-pos 0))))
           ((eq? gimmick 'L)
            (if (zero? key-count)
                env
                (edit env
                      pos new-pos
-                     stage (list (car (dec-remain-act env 1))
-                                 (- key-count 1)
-                                 (change-element2 field-data new-pos 'U)))))
+                     stage (edit stage-env
+                                 0 (dec-remain-act 1)
+                                 1 (- key-count 1)
+                                 3 (change-element2 field-data new-pos 'U)))))
           (else
            (edit env
                  pos new-pos
-                 stage (dec-remain-act env 1)))))
+                 stage (edit stage-env 0 (dec-remain-act 1))))))
   (cond ((string=? key "p") (edit env screen 3))
         ((string=? key "r") (init-stage env))
         ((dir? key) (player-move env key))
@@ -436,7 +458,8 @@
 (define (init-stage env)
   (define map-data
     (let ((stage (stage-selecting env)))
-      (cond ((= stage 0) map-data-tutorial)
+      (cond ((= stage -1) map-data-test)
+            ((= stage 0) map-data-tutorial)
             ((= stage 1) map-data-1)
             ((= stage 2) map-data-2)
             ((= stage 3) map-data-3)
@@ -444,9 +467,11 @@
             ((= stage 5) map-data-5)
             ((= stage 6) map-data-6))))
   (edit env
+        select (if (= stage -1) 0 (stage-selecting env))
         pos (init-player-pos map-data)
         stage (list (init-step-remain map-data)
-                    0
+                    (init-key-count map-data)
+                    (map-size map-data)
                     (field-data map-data))))
 
 (define (dir? key)
