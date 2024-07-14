@@ -1,5 +1,5 @@
-
 #lang racket
+(require reactor)
 (require "reactor-lib.rkt")
 (require 2htdp/image)
 (require 2htdp/universe)
@@ -80,6 +80,10 @@
             (change-element2 (cdr l2)
                              (cons (car pos) (- (cdr pos) 1))
                              content))))
+
+(define (pos=? p1 p2)
+  (and (= (car p1) (car p2))
+       (= (cdr p1) (cdr p2))))
 
 ;;test用関数
 (define (select-print env s)
@@ -285,8 +289,7 @@
           '()
           (cons
            (cond
-             ((and (= (car (player-pos-in-stage env)) (car pos))
-                   (= (cdr (player-pos-in-stage env)) (cdr pos))) smile)
+             ((pos=? (player-pos-in-stage env) pos) smile)
              ((eq? (car row) 'w) wall)
              ((eq? (car row) 'b) empty-image)
              ((eq? (car row) '-) minus1)
@@ -386,8 +389,7 @@
     (define gimmick (take-element2 field-data new-pos))
     (cond ((or (eq? gimmick 'w)
                (eq? gimmick 'b)
-               (and (= (car cur-pos) (car new-pos))
-                    (= (cdr cur-pos) (cdr new-pos)))
+               (pos=? cur-pos new-pos)
                (and (eq? gimmick 'u) (string=? dir "down"))
                (and (eq? gimmick 'd) (string=? dir "up"))
                (and (eq? gimmick 'l) (string=? dir "right"))
