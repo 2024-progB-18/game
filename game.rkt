@@ -424,7 +424,7 @@
            (if (eq? (take-element2 field-data next-pos) 0)
                (edit env
                      stage (edit stage-env
-                                 0 (dec-remain-act 2)
+                                 0 (dec-remain-act 1)
                                  3 (change-element2
                                     (change-element2 field-data new-pos 0)
                                     next-pos 'o)))
