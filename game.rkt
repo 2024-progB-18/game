@@ -591,6 +591,10 @@
   (define BOTTON-SEL-Y (+ cy (/ cy 2)))
   (define TITLE-Y (- cy (/ cy 2)))
   (define botton (rectangle BOTTON-WIDTH BOTTON-HEIGHT "solid" "orange"))
+  (define y
+      (if (= (car (stage-result env)) 0)
+          BOTTON-NEX-Y
+          BOTTON-SEL-Y))
   (define (title-success s)
     (place-image (text "SUCCESS" TITLE-TXTSIZE "red") cx TITLE-Y s))
   (define (botton-nextstage s)
@@ -598,13 +602,14 @@
                (place-image botton cx BOTTON-NEX-Y s)))
   (define (botton-selectstage s)
     (place-image (text "select stage" BOTTON-TXTSIZE "black") cx BOTTON-SEL-Y
-               (place-image botton cx BOTTON-SEL-Y s)))
+                 (place-image botton cx BOTTON-SEL-Y s)))
+  (define (botton-returntitle s)
+    (place-image (text "return title" BOTTON-TXTSIZE "black") cx BOTTON-NEX-Y
+                 (place-image botton cx BOTTON-NEX-Y s)))
   (define (outline-select env s)
-    (define y
-      (if (= (car (stage-result env)) 0)
-          BOTTON-NEX-Y
-          BOTTON-SEL-Y))
     (place-image (rectangle (+ BOTTON-WIDTH (/ BOTTON-WIDTH 8)) (+ BOTTON-HEIGHT (/ BOTTON-WIDTH 8)) "outline" "red") cx y s))
+ ;; (define (dot-select env s)
+   ;; (place-image ()))
   (outline-select env (botton-selectstage (botton-nextstage (title-success
                                                    ;;test用 (select-print env SCENE)
                                                              SCENE
@@ -614,7 +619,10 @@
   (define prev "up")
   (define next "down")
   (define do "\r")
-   (cond ((= (car (stage-result env)) 0)
+  (if (= (stage-selecting env) 6)
+      (cond ((string=? key do) WORLD-ENVIROMENT)
+            (else env))
+      (cond ((= (car (stage-result env)) 0)
          (cond ((string=? key do)
                 (init-stage
                  (edit env
@@ -630,4 +638,4 @@
                ((string=? key prev)
                 (edit env result (list 0)))
                (else env)))
-        (else env)))
+        (else env))))
