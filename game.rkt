@@ -597,9 +597,6 @@
             ((= stage 6) map-data-6)
             (else map-data-test))))
   (edit env
-        select (if (ormap (lambda (n) (= (stage-selecting env) n)) (range 1 7))
-                   (stage-selecting env)
-                   0)
         pos (init-player-pos map-data)
         stage (list (init-step-remain map-data)
                     (init-key-count map-data)
