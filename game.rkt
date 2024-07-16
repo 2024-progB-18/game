@@ -113,6 +113,7 @@
 (define (map-size map-data) (cadddr map-data))
 (define (field-data map-data) (car (cddddr map-data)))
 (define (move-object-list map-data) (cadr (cddddr map-data)))
+(define (switch-func-list map-data) (caddr (cddddr map-data)))
 
 (define map-data-tutorial
   '(20
@@ -124,6 +125,7 @@
      (g w 0 0 o 0)
      (0 0 w 0 0 b)
      (0 o 0 L 0 b))
+    ()
     ()))
 (define map-data-1
   '(99
@@ -132,6 +134,7 @@
     (2 . 2)
     ((0 0)
      (0 g))
+    ()
     ()))
 (define map-data-2
   '(99
@@ -140,6 +143,7 @@
     (2 . 2)
     ((0 0)
      (0 g))
+    ()
     ()))
 (define map-data-3
   '(99
@@ -148,6 +152,7 @@
     (2 . 2)
     ((0 0)
      (0 g))
+    ()
     ()))
 (define map-data-4
   '(99
@@ -166,7 +171,8 @@
      (w 0 0 0 0 0 w 0 0 0 0 0 w)
      (w 0 0 0 0 0 w 0 0 0 0 0 w)
      (w w w w w w w w w w w w w))
-    ((i (9 . 3)))))
+    ((i (9 . 3)))
+    ()))
 (define map-data-5
   '(99
     0
@@ -174,6 +180,7 @@
     (2 . 2)
     ((0 0)
      (0 g))
+    ()
     ()))
 (define map-data-6
   '(99
@@ -182,25 +189,34 @@
     (2 . 2)
     ((0 0)
      (0 g))
+    ()
     ()))
 (define map-data-test
-  '(99
+  `(99
     0
     (0 . 0)
     (12 . 12)
-    ((0 0 0 0 0 0 0 - 0 + 0 0)
-     (0 w 0 w 0 0 o 0 0 0 0 0)
-     (0 w 0 w 0 0 0 0 0 0 0 0)
-     (0 w 0 w w w 0 0 0 0 0 0)
-     (0 w 0 l 0 w 0 0 0 0 0 0)
-     (0 w 0 w 0 w 0 0 0 0 0 0)
-     (w w d w 0 w w 0 0 0 0 0)
-     (0 0 0 r u 0 0 0 0 0 0 0)
-     (0 0 0 w w w 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0 0 0 0 0)
-     (0 0 0 0 0 0 0 0 0 0 0 g))
-    ()))
+    ((0 0 0 0 0 0 0 - 0 + 0 (s 0))
+     (0 w 0 w 0 0 o 0 0 0 0 0    )
+     (0 w 0 w 0 0 0 0 0 0 0 0    )
+     (0 w 0 w w w 0 0 0 0 0 0    )
+     (0 w 0 l 0 w 0 0 0 0 0 0    )
+     (k w 0 w 0 w 0 0 0 0 0 0    )
+     (w w d w 0 w w 0 0 0 0 0    )
+     (0 0 0 r u 0 L 0 0 0 0 0    )
+     (0 0 0 w w w w 0 0 0 0 0    )
+     (w w 0 0 0 0 0 0 0 0 0 0    )
+     (i 0 w 0 0 0 0 0 0 0 0 0    )
+     (0 0 w 0 0 0 0 0 0 0 0 g    ))
+    ((i (0 . 10)))
+    (,(lambda (f-data)
+       (change-element2
+        (change-element2 f-data '(11 . 0) '(s 1))
+        '(11 . 2) 'w))
+     ,(lambda (f-data)
+       (change-element2
+        (change-element2 f-data '(11 . 0) '(s 0))
+        '(11 . 2) 0)))))
 
 ;;ゲームスタート
 (define demo "demo")
@@ -329,6 +345,10 @@
           (cons
            (cond
              ((pos=? (player-pos-in-stage env) pos) smile)
+             ((list? (car row))
+              (cond
+                ((eq? (caar row) 's) empty-image)
+                (else ground)))
              ((eq? (car row) 'w) wall)
              ((eq? (car row) 'b) empty-image)
              ((eq? (car row) '+) (place-image plus1 32 32 ground))
@@ -401,6 +421,7 @@
   (define mapsize (caddr stage-env))
   (define field-data (cadddr stage-env))
   (define move-object-list (car (cddddr stage-env)))
+  (define switch-func-list (cadr (cddddr stage-env)))
   (define (update-pos pos dir)
       (define x (car pos))
       (define y (cdr pos))
@@ -430,7 +451,20 @@
     (define cur-pos (player-pos-in-stage env))
     (define new-pos (update-pos cur-pos dir))
     (define gimmick (take-element2 field-data new-pos))
-    (cond ((or (eq? gimmick 'w)
+    (cond ((list? gimmick)
+           (cond
+             ((eq? (car gimmick) 's)
+              (edit env
+                    pos new-pos
+                    stage (edit stage-env
+                                3 ((take-element switch-func-list
+                                                 (cadr gimmick))
+                                   field-data))))
+             (else
+              (edit env
+                    pos new-pos
+                    stage (edit stage-env 0 (dec-remain-act 1))))))
+          ((or (eq? gimmick 'w)
                (eq? gimmick 'b)
                (pos=? cur-pos new-pos)
                (and (eq? gimmick 'u) (string=? dir "down"))
@@ -457,7 +491,10 @@
                                     (change-element2 field-data new-pos 0)
                                     next-pos 'o)))
                env))
-          ((eq? gimmick 'g) (edit env screen 5))
+          ((eq? gimmick 'g) (edit select (if (= (stage-selecting env) -1)
+                                             0
+                                             (stage-selecting env))
+                                  env screen 5))
           ((eq? gimmick 'k)
            (edit env
                  pos new-pos
@@ -568,7 +605,8 @@
                     (init-key-count map-data)
                     (map-size map-data)
                     (field-data map-data)
-                    (move-object-list map-data))))
+                    (move-object-list map-data)
+                    (switch-func-list map-data))))
 
 (define (dir? key)
   (or (string=? key "up")
