@@ -341,6 +341,7 @@
              ((eq? (car row) 'L) lock)
              ((eq? (car row) 'U) (place-image unlock 32 32 ground))
              ((eq? (car row) 'i) empty-image)
+             ((eq? (car row) 'e) empty-image)
              (else ground))
            (make-row (cdr row) (cons (+ (car pos) 1) (cdr pos))))))
     (define (make-col col pos)
