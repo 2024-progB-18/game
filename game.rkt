@@ -97,6 +97,7 @@
 (define smile (bitmap/file "smile.bmp"))
 (define wall (bitmap/file "iron-barred-block.bmp"))
 (define ground (bitmap/file "green-grass.bmp"))
+(define plus1 (bitmap/file "plus1.png"))
 (define minus1 (bitmap/file "minus1.png"))
 (define pushobject (bitmap/file "wooden-box.bmp"))
 (define limit (bitmap/file "limit.png"))
@@ -187,7 +188,7 @@
     0
     (0 . 0)
     (12 . 12)
-    ((0 0 0 0 0 0 0 - 0 0 0 0)
+    ((0 0 0 0 0 0 0 - 0 + 0 0)
      (0 w 0 w 0 0 o 0 0 0 0 0)
      (0 w 0 w 0 0 0 0 0 0 0 0)
      (0 w 0 w w w 0 0 0 0 0 0)
@@ -330,6 +331,7 @@
              ((pos=? (player-pos-in-stage env) pos) smile)
              ((eq? (car row) 'w) wall)
              ((eq? (car row) 'b) empty-image)
+             ((eq? (car row) '+) (place-image plus1 32 32 ground))
              ((eq? (car row) '-) (place-image minus1 32 32 ground))
              ((eq? (car row) 'o) pushobject)
              ((eq? (car row) 'u) (place-image limit 32 32 ground))
@@ -436,6 +438,11 @@
                (and (eq? gimmick 'l) (string=? dir "right"))
                (and (eq? gimmick 'r) (string=? dir "left")))
            env)
+          ((eq? gimmick '+)
+           (edit env
+                 pos new-pos
+                 stage (edit stage-env
+                             3 (change-element2 field-data new-pos 0))))
           ((eq? gimmick '-)
            (edit env
                  pos new-pos
