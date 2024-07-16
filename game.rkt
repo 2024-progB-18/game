@@ -502,30 +502,47 @@
   (define BOTTON-SEL-Y (+ cy (/ cy 2)))
   (define TITLE-Y (- cy (/ cy 2)))
   (define botton (rectangle BOTTON-WIDTH BOTTON-HEIGHT "solid" "orange"))
-  (define (title-success s)
-    (place-image (text "SUCCESS" TITLE-TXTSIZE "red") cx TITLE-Y s))
-  (define (botton-nextstage s)
-    (place-image (text "next stage" BOTTON-TXTSIZE "black") cx BOTTON-NEX-Y
-               (place-image botton cx BOTTON-NEX-Y s)))
-  (define (botton-selectstage s)
-    (place-image (text "select stage" BOTTON-TXTSIZE "black") cx BOTTON-SEL-Y
-               (place-image botton cx BOTTON-SEL-Y s)))
-  (define (outline-select env s)
-    (define y
+  (define y
       (if (= (car (stage-result env)) 0)
           BOTTON-NEX-Y
           BOTTON-SEL-Y))
-    (place-image (rectangle (+ BOTTON-WIDTH (/ BOTTON-WIDTH 8)) (+ BOTTON-HEIGHT (/ BOTTON-WIDTH 8)) "outline" "red") cx y s))
-  (outline-select env (botton-selectstage (botton-nextstage (title-success
+  (define (title-success s)
+    (place-image (text "SUCCESS" TITLE-TXTSIZE "red") cx TITLE-Y s))
+  (define (title-clear s)
+    (place-image (text "ALL CLEAR" (* TITLE-TXTSIZE 1.5) "red") cx TITLE-Y s))
+  (define (txt-nextstage s)
+    (place-image (text "next stage" BOTTON-TXTSIZE "black") cx BOTTON-NEX-Y s))
+  (define (botton-nextstage s)
+    (txt-nextstage (place-image botton cx BOTTON-NEX-Y s)))
+  (define (txt-selectstage s)
+    (place-image (text "select stage" BOTTON-TXTSIZE "black") cx BOTTON-SEL-Y s))
+  (define (botton-selectstage s)
+    (txt-selectstage (place-image botton cx BOTTON-SEL-Y s)))
+  (define (txt-returntitle s)
+    (place-image (text "return title" BOTTON-TXTSIZE "black") cx BOTTON-NEX-Y s))
+  (define (botton-returntitle s)
+    (txt-returntitle (place-image botton cx BOTTON-NEX-Y s)))
+  (define (outline-select s)
+    (place-image (rectangle (+ BOTTON-WIDTH (/ BOTTON-WIDTH 8))
+                            (+ BOTTON-HEIGHT (/ BOTTON-WIDTH 8))
+                            "outline" "red") cx y s))
+  (define (dot-select s)
+    (place-image (circle 30 "solid" "black") (- cx (/ cx 3)) y s))
+  (if (= (stage-selecting env) 6)
+      (dot-select (txt-returntitle (title-clear SCENE)))
+      (dot-select (txt-selectstage (txt-nextstage (title-success
                                                    ;;test用 (select-print env SCENE)
                                                              SCENE
-                                                             )))))
+                                                             ))))))
 
 (define (success-key-event env key)
   (define prev "up")
   (define next "down")
   (define do "\r")
-   (cond ((= (car (stage-result env)) 0)
+  (if (= (stage-selecting env) 6)
+      (cond ((string=? key do) WORLD-ENVIROMENT)
+            (else env))  
+      (cond ((= (car (stage-result env)) 0)
          (cond ((string=? key do)
                 (init-stage
                  (edit env
@@ -541,4 +558,4 @@
                ((string=? key prev)
                 (edit env result (list 0)))
                (else env)))
-        (else env)))
+        (else env))))
