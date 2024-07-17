@@ -1,3 +1,4 @@
+
 #lang racket
 (require reactor)
 (require "reactor-lib.rkt")
@@ -19,7 +20,7 @@
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
-  (list 0 0 (cons 0 0) (list 99) (list null) (list 0)))
+  (list 0 0 (cons 0 0) '() (list 1 380) (list 0)))
 (define (screen-type env) (car env))
 (define (stage-selecting env) (cadr env))
 (define (player-pos-in-stage env) (caddr env))
@@ -310,7 +311,7 @@
   (cond ((= (screen-type env) 0) start-screen)
         ((= (screen-type env) 1) (selection-screen (stage-selecting env)))
         ((= (screen-type env) 2) (stage-screen env))
-        ((= (screen-type env) 3) pause-screen)
+        ((= (screen-type env) 3) (pause-screen env))
         ((= (screen-type env) 4) fail-screen)
         ((= (screen-type env) 5) (success-screen env))
         (else (error "wrong enviroment"))))
@@ -758,14 +759,37 @@
       (string=? key "left")
       (string=? key "right")))
 
-(define pause-screen
-  SCENE)
+(define (pause-screen env);;上野
+  (define me-y (cadr (pause-state-list env)))
+               (place-image (text "PAUSE" 100 "white")
+                           640
+                           120
+  (place-image (text "<1> CLOSE" 40 "white")
+               640
+               330
+               (place-image (text "<2> STAGE-SELECT" 40 "white")
+                            640
+                            380
+                            (place-image (text "<3> RESTART" 40 "white")
+                                         640
+                                         430
+                                         (empty-scene SCENE-WIDTH SCENE-HEIGHT "black"))))))
 
 (define (pause-key-event env key)
-  env)
+  (define me-y (cadr (pause-state-list env)))
+  (cond ((string=? key "1");;1を押したらpausemenuを閉じる
+          (edit env screen 2))
+        
+          ((string=? key "2");;2を押したらstage-selectへ
+            (edit env screen 1 pos (cons 0 0)))
+           
+       ((string=? key "3");;3を押したらRESTART
+            (init-stage env));;キャラを初期位置に戻す。行動回数のリセット。
+       (else env)))
+   
 
 ;;
-(define fail-screen;;上野智ですよ
+(define fail-screen
   SCENE)
 
 ;;yuta
