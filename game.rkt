@@ -94,9 +94,11 @@
 (define sample-square (bitmap/file "sample-square.bmp"))
 (define sample-frame (bitmap/file "sample-frame.bmp"))
 (define frame64 (bitmap/file "frame64.bmp"))
+(define stage1 (bitmap/file "stage1.png"))
+(define floor1 (bitmap/file "floor1.png"))
 (define smile (bitmap/file "smile.bmp"))
 (define wall (bitmap/file "iron-barred-block.bmp"))
-(define ground (bitmap/file "green-grass.bmp"))
+(define grass (bitmap/file "green-grass.bmp"))
 (define plus1 (bitmap/file "plus1.png"))
 (define minus1 (bitmap/file "minus1.png"))
 (define pushobject (bitmap/file "wooden-box.bmp"))
@@ -129,12 +131,14 @@
     ()
     ()))
 (define map-data-1
-  '(99
+  '(15
     0
-    (0 . 0)
-    (2 . 2)
-    ((0 0)
-     (0 g))
+    (0 . 3)
+    (7 . 4)
+    ((b b k + b b g)
+     (+ 0 o 0 0 b L)
+     (0 0 o 0 - 0 l)
+     (0 b 0 r 0 0 0))
     ()
     ()))
 (define map-data-2
@@ -341,6 +345,9 @@
   (define field-data (cadddr (stage-state-list env)))
   (define (map-image-list)
     (define (make-row row pos)
+      (define ground
+        (cond ((= (stage-selecting env) 1) floor1)
+              (else grass)))
       (if (null? row)
           '()
           (cons
@@ -395,7 +402,8 @@
   (define map-field
     (place-images (map-image-list)
                   (map-pos-list)
-                  SCENE))
+                  (cond ((= (stage-selecting env) 1) stage1)
+                        (else SCENE))))
   (define (add-step-counter image)
     (define text
       (text/font (number->string (car (stage-state-list env)))
@@ -403,7 +411,10 @@
     (place-image text
                  (- SCENE-WIDTH 96)
                  (- SCENE-HEIGHT 64)
-                 image))
+                 (place-image (rectangle 192 128 "solid" "white")
+                              (- SCENE-WIDTH 96)
+                              (- SCENE-HEIGHT 64)
+                              image)))
   (define (add-key-counter image)
     (let ((key-count
            (text/font (number->string (cadr (stage-state-list env)))
