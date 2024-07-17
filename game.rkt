@@ -4,9 +4,9 @@
 (require 2htdp/universe)
 
 ;;背景(外枠)スクリーンの定義
-(define SCENE-WIDTH 1280) ;1920
-(define SCENE-HEIGHT 768) ;1024
-(define SCENE (empty-scene SCENE-WIDTH SCENE-HEIGHT "white"))
+(define SCENE-WIDTH 1280)
+(define SCENE-HEIGHT 768) 
+(define SCENE (empty-scene SCENE-WIDTH SCENE-HEIGHT "beige"))
 
 ;;１マスの大きさ
 (define SQUARE 64)
@@ -81,9 +81,9 @@
 
 ;;
 (define start-screen;木下知哉
-    (place-image (text "課題を提出せよ" 150 "red") ;Submit your reports
+    (place-image (text "Submit your reports" 140 "red")
                  640
-                 128
+                 256
         (place-image (text "press Enter key" 50 "blue")
                      640
                      512
@@ -103,14 +103,14 @@
   SCENE)
 
 (define (selection-key-event env key);hayato
-; (define(decision-stage)
-  ; (cond
-     ;  ((= select 1)(1st-stage))
-     ;  ((= select 2)(2nd-stage))
-     ;  ((= select 3)(3rd-stage))
-     ;  ((= secect 4)(4th-stage))
-     ;  ((= secect 5)(5th-stage))
-     ;  ((= secect 6)(6th-stage))))
+ (define(decision-stage)
+   (cond
+       ((= select 1)(1st-stage))
+       ((= select 2)(2nd-stage))
+       ((= select 3)(3rd-stage))
+       ((= secect 4)(4th-stage))
+       ((= secect 5)(5th-stage))
+       ((= secect 6)(6th-stage))))
       env)
 ;;
 (define stage-screen
