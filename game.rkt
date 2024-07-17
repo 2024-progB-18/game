@@ -91,13 +91,12 @@
                (- SCENE-WIDTH 25) (- SCENE-HEIGHT 25) s))
 
 ;;画像のロード
-(define sample-square (bitmap/file "sample-square.bmp"))
-(define sample-frame (bitmap/file "sample-frame.bmp"))
-(define frame64 (bitmap/file "frame64.bmp"))
 (define stage1 (bitmap/file "stage1.png"))
 (define floor1 (bitmap/file "floor1.png"))
+(define floor2 (bitmap/file "lib-floor.bmp"))
+(define wall2 (bitmap/file "lib-book.bmp"))
 (define smile (bitmap/file "smile.bmp"))
-(define wall (bitmap/file "iron-barred-block.bmp"))
+(define iron-block (bitmap/file "iron-barred-block.bmp"))
 (define grass (bitmap/file "green-grass.bmp"))
 (define plus1 (bitmap/file "plus1.png"))
 (define minus1 (bitmap/file "minus1.png"))
@@ -107,6 +106,7 @@
 (define key (bitmap/file "key.png"))
 (define lock (bitmap/file "lock.png"))
 (define unlock (bitmap/file "unlock.png"))
+(define switch empty-image)
 (define jump empty-image)
 (define device empty-image)
 (define lazer-h empty-image)
@@ -151,14 +151,57 @@
     ()
     ()))
 (define map-data-2
-  '(99
+  `(99
     0
-    (0 . 0)
-    (2 . 2)
-    ((0 0)
-     (0 g))
+    (4 . 1)
+    (6 . 6)
+    ((b b b b b (s 0))
+     (0 k (s 0) b 0 0)
+     (0 0 u b b 0)
+     (l 0 0 + l u)
+     (l - 0 b b d)
+     ((s 0) l + b g L))
     ()
-    ()
+    (,(lambda (f-data)
+        (change-element2
+         (change-element2
+          (change-element2
+           (change-element2
+            (change-element2
+             (change-element2
+              (change-element2
+               (change-element2
+                (change-element2
+                 (change-element2 f-data '(5 . 0) '(s 1))
+                 '(2 . 1) '(s 1))
+                '(0 . 5) '(s 1))
+               '(2 . 2) 'd)
+              '(0 . 3) 'r)
+             '(0 . 4) 'r)
+            '(1 . 5) 'r)
+           '(4 . 3) 'l)
+          '(5 . 3) 'd)
+         '(5 . 4) 'u))
+     ,(lambda (f-data)
+        (change-element2
+         (change-element2
+          (change-element2
+           (change-element2
+            (change-element2
+             (change-element2
+              (change-element2
+               (change-element2
+                (change-element2
+                 (change-element2 f-data '(5 . 0) '(s 0))
+                 '(2 . 1) '(s 0))
+                '(0 . 5) '(s 0))
+               '(2 . 2) 'u)
+              '(0 . 3) 'l)
+             '(0 . 4) 'l)
+            '(1 . 5) 'l)
+           '(4 . 3) 'r)
+          '(5 . 3) 'u)
+         '(5 . 4) 'd)))
     ()
     ()))
 (define map-data-3
@@ -369,7 +412,11 @@
     (define (make-row row pos)
       (define ground
         (cond ((= (stage-selecting env) 1) floor1)
+              ((= (stage-selecting env) 2) floor2)
               (else grass)))
+      (define wall
+        (cond ((= (stage-selecting env) 2) wall2)
+              (else iron-block)))
       (if (null? row)
           '()
           (let* ((c (car row))
@@ -378,7 +425,7 @@
                     ((pos=? (player-pos-in-stage env) pos) smile)
                     ((list? c)
                      (cond
-                       ((eq? (car c) 's) empty-image)))
+                       ((eq? (car c) 's) (place-image switch 32 32 ground))))
                     ((eq? c 'w) wall)
                     ((eq? c 'b) empty-image)
                     ((eq? c '+) (place-image plus1 32 32 ground))
