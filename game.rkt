@@ -7,8 +7,8 @@
 
 ;;背景(外枠)スクリーンの定義
 (define SCENE-WIDTH 1280)
-(define SCENE-HEIGHT 768)
-(define SCENE (empty-scene SCENE-WIDTH SCENE-HEIGHT "white"))
+(define SCENE-HEIGHT 768) 
+(define SCENE (empty-scene SCENE-WIDTH SCENE-HEIGHT "beige"))
 
 ;;１マスの大きさ
 (define SQUARE 64)
@@ -259,16 +259,16 @@
 
 ;;
 (define start-screen;木下知哉
-  (place-image sample-frame
-               512
-               288
-               (place-image frame64
-                            512
-                            288
+    (place-image (text "Submit your reports" 140 "red")
+                 640
+                 256
+        (place-image (text "press Enter key" 50 "blue")
+                     640
+                     512
                             SCENE)))
 
 (define (start-key-event env key)
-  (cond ((string=? key "enter") (list 1
+  (cond ((string=? key "\r") (list 1
                                       (stage-selecting env)
                                       (player-pos-in-stage env)
                                       (stage-state-list env)
