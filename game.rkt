@@ -781,10 +781,10 @@
           (edit env screen 2))
         
           ((string=? key "2");;2を押したらstage-selectへ
-            (edit env screen 1 pos (cons 0 0)))
+            (edit env screen 1))
            
        ((string=? key "3");;3を押したらRESTART
-            (init-stage env));;キャラを初期位置に戻す。行動回数のリセット。
+            (init-stage (edit env screen 2)));;キャラを初期位置に戻す。行動回数のリセット
        (else env)))
    
 
