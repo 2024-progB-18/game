@@ -143,12 +143,9 @@
           (stage-result env))))
 
 
-;;(define ME (text "<<                                   >>" 40 "white"));;プレイヤーのカーソル
-
 
 (define (pause-screen env);;上野
   (define me-y (cadr (pause-state-list env)))
-  ;;(define draw-screen
                (place-image (text "PAUSE" 100 "white")
                            640
                            120
@@ -172,7 +169,7 @@
             (edit env screen 1 pos (cons 0 0)))
            
        ((string=? key "3");;3を押したらRESTART
-            (edit env pos (cons 0 0)));;キャラを初期位置に戻す。行動回数のリセット。
+            (init-stage env));;キャラを初期位置に戻す。行動回数のリセット。
        (else env)))
    
 
