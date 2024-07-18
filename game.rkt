@@ -272,9 +272,9 @@
      (0 w 0 w 0 0  0 0 0  0 0  0 0 0    )
      (0 w 0 w w w  0 0 Il 0 Ir 0 0 w    )
      (0 w 0 l 0 w  0 0 0  0 0  0 0 0    )
-     (k w 0 w 0 w  0 0 0  0 0  0 0 (+ 3))
-     (w w d w 0 w  w 0 0  0 0  0 0 0    )
-     (0 0 0 r u 0  L 0 0  0 0  0 0 (- 3))
+     (k w 0 w 0 w  0 0 0  0 0  0 0 (x 5))
+     (w w d w 0 w  w 0 0  0 0  0 0 (x 3))
+     (0 0 0 r u 0  L 0 0  0 0  0 0 (x -2))
      (0 0 0 w w w  w 0 0  0 0  0 0 0    )
      (w w 0 0 0 ju 0 0 0  0 0  0 0 0    )
      (i 0 w 0 0 0  0 0 0  0 0  0 0 0    )
@@ -431,11 +431,11 @@
                      (cond
                        ((eq? (car c) 's)
                         (place-image switch 32 32 ground))
-                       ((and (eq? (car c) '+) (= (cadr c) 3))
+                       ((and (eq? (car c) 'x) (= (cadr c) 3))
                         (place-image plus3 32 32 ground))
-                       ((and (eq? (car c) '+) (= (cadr c) 5))
+                       ((and (eq? (car c) 'x) (= (cadr c) 5))
                         (place-image plus5 32 32 ground))
-                       ((eq? (car c) '-)
+                       ((and (eq? (car c) 'x) (= (cadr c) -2))
                         (place-image minus2 32 32 ground))))
                     ((eq? c 'w) wall)
                     ((eq? c 'b) empty-image)
@@ -571,7 +571,14 @@
                            (edit stage-env
                                  3 ((take-element switch-func-list
                                                   (cadr gimmick))
-                                    field-data)))))))
+                                    field-data)))))
+             ((eq? (car gimmick) 'x)
+              (edit env
+                    pos new-pos
+                    stage (edit stage-env
+                                0 (+ (car stage-env) (- (cadr gimmick) 1))
+                                3 (change-element2 field-data
+                                                   new-pos '0))))))
           ((or (eq? gimmick 'w)
                (eq? gimmick 'b)
                (eq? gimmick 'Iu)
