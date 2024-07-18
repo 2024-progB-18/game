@@ -93,6 +93,7 @@
 
 ;;画像のロード
 (define stage1 (bitmap/file "stage1.png"))
+(define stage2 (bitmap/file "stage2.png"))
 (define floor1 (bitmap/file "floor1.png"))
 (define floor2 (bitmap/file "lib-floor.png"))
 (define wall2 (bitmap/file "lib-book.png"))
@@ -110,7 +111,7 @@
 (define key (bitmap/file "key.png"))
 (define lock (bitmap/file "lock.png"))
 (define unlock (bitmap/file "unlock.png"))
-(define switch empty-image)
+(define rev-switch (bitmap/file "rev-switch.png"))
 (define jump (bitmap/file "jump-pad.png"))
 (define device (bitmap/file "laser-device.png"))
 (define laser-h (bitmap/file "laser-horizontal.png"))
@@ -159,12 +160,12 @@
     0
     (4 . 1)
     (6 . 6)
-    ((b b b b b (s 0))
-     (0 k (s 0) b 0 0)
-     (0 w u b b 0)
+    ((w w w w w (s 0))
+     (0 k (s 0) w 0 0)
+     (0 w u w w 0)
      (l 0 0 + l u)
-     (l - 0 b b d)
-     ((s 0) l + b g L))
+     (l - 0 w w d)
+     ((s 0) l + w g L))
     ()
     (,(lambda (f-data)
         (change-element2
@@ -418,6 +419,9 @@
         (cond ((= (stage-selecting env) 1) floor1)
               ((= (stage-selecting env) 2) floor2)
               (else grass)))
+      (define switch
+        (cond ((= (stage-selecting env) 2) rev-switch)
+              (else rev-switch)))
       (define wall
         (cond ((= (stage-selecting env) 2) wall2)
               (else iron-block)))
@@ -497,6 +501,7 @@
     (place-images (map-image-list)
                   (map-pos-list)
                   (cond ((= (stage-selecting env) 1) stage1)
+                        ((= (stage-selecting env) 2) stage2)
                         (else SCENE))))
   (define (add-step-counter image)
     (define text
