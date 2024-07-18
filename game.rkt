@@ -20,13 +20,14 @@
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
-  (list 0 0 (cons 0 0) '() (list 1 380) (list 0)))
+  (list 0 0 (cons 0 0) '() (list 1 380) (list 0) 5))
 (define (screen-type env) (car env))
 (define (stage-selecting env) (cadr env))
 (define (player-pos-in-stage env) (caddr env))
 (define (stage-state-list env) (cadddr env))
 (define (pause-state-list env) (car (cddddr env)))
 (define (stage-result env) (cadr (cddddr env)))
+(define (fail-timer env) (caddr (cddddr env)))
 
 (define screen 0)
 (define select 1)
@@ -120,6 +121,9 @@
 (define device (bitmap/file "laser-device.png"))
 (define laser-h (bitmap/file "laser-horizontal.png"))
 (define laser-v (bitmap/file "laser-vertical.png"))
+(define explo1 (bitmap/file "explo1.png"))
+(define explo2 (bitmap/file "explo2.png"))
+(define explo3 (bitmap/file "explo3.png"))
 
 ;;ステージデータ
 (define (init-step-remain map-data) (car map-data))
@@ -160,7 +164,7 @@
     ()
     ()))
 (define map-data-2
-  `(99
+  `(25
     0
     (4 . 1)
     (6 . 6)
@@ -333,19 +337,15 @@
 (define demo "demo")
 (define test "test")
 (define (start . option)
-  (cond ((null? option)
-         (big-bang WORLD-ENVIROMENT
-                   (to-draw display-contents)
-                   (on-key key-action)))
-        ((string=? (car option) demo)
-         (big-bang WORLD-ENVIROMENT
-                   (to-draw display-contents)
-                   (on-key key-action)))
-        ((string=? (car option) test)
-         (big-bang (cons (cadr option) (cdr (init-stage WORLD-ENVIROMENT)))
-                   (to-draw display-contents)
-                   (on-key key-action)))
-        (else (error "undefined option:" option))))
+  (big-bang (cond ((null? option) WORLD-ENVIROMENT)
+                  ((string=? (car option) "demo")
+                   (init-stage (edit WORLD-ENVIROMENT screen 2 select -1)))
+                  ((string=? (car option) "test")
+                   (cons (cadr option) (cdr (init-stage WORLD-ENVIROMENT))))
+                  (else WORLD-ENVIROMENT))
+            (to-draw display-contents)
+            (on-key key-action)
+            (on-tick tick-process 0.10)))
 
 ;;画面表示内容
 (define (display-contents env)
@@ -353,7 +353,7 @@
         ((= (screen-type env) 1) (selection-screen (stage-selecting env)))
         ((= (screen-type env) 2) (stage-screen env))
         ((= (screen-type env) 3) (pause-screen env))
-        ((= (screen-type env) 4) fail-screen)
+        ((= (screen-type env) 4) (stage-screen env))
         ((= (screen-type env) 5) (success-screen env))
         (else (error "wrong enviroment"))))
 
@@ -378,13 +378,8 @@
                             SCENE)))
 
 (define (start-key-event env key)
-  (cond ((string=? key "\r") (list 1
-                                      (stage-selecting env)
-                                      (player-pos-in-stage env)
-                                      (stage-state-list env)
-                                      (pause-state-list env)
-                                      (stage-result env)))
-          (else env)))
+  (cond ((string=? key "\r") (edit env screen 1))
+        (else env)))
 
 ;;
 (define  (selection-screen env)
@@ -450,6 +445,7 @@
   (define field-height (* (cdaddr (stage-state-list env)) SQUARE))
   (define field-data (cadddr (stage-state-list env)))
   (define lazer-list (take-element (stage-state-list env) 7))
+  (define f-timer (fail-timer env))
   (define (map-image-list)
     (define (make-row row pos)
       (define ground
@@ -469,7 +465,9 @@
           (let* ((c (car row))
                  (image
                   (cond
-                    ((pos=? (player-pos-in-stage env) pos) smile)
+                    ((and (= (screen-type env) 2)
+                          (pos=? (player-pos-in-stage env) pos))
+                     smile)
                     ((list? c)
                      (cond
                        ((eq? (car c) 's)
@@ -503,17 +501,27 @@
                     ((eq? c 'Id) (place-image (rotate 180 device) 32 32 ground))
                     ((eq? c 'Ir) (place-image (rotate 270 device) 32 32 ground))
                     ((eq? c 'Il) (place-image (rotate 90 device) 32 32 ground))
-                    (else ground))))
+                    (else ground)))
+                 (laser-added-image
+                  (cond ((ormap (lambda (l) (and (eq? (cadr l) 'h)
+                                                 (pos=? (car l) pos)))
+                                lazer-list)
+                         (place-image laser-h 32 32 image))
+                        ((ormap (lambda (l) (and (eq? (cadr l) 'v)
+                                                 (pos=? (car l) pos)))
+                                lazer-list)
+                         (place-image laser-v 32 32 image))
+                        (else image))))
             (cons
-             (cond ((ormap (lambda (l) (and (eq? (cadr l) 'h)
-                                            (pos=? (car l) pos)))
-                           lazer-list)
-                    (place-image laser-h 32 32 image))
-                   ((ormap (lambda (l) (and (eq? (cadr l) 'v)
-                                            (pos=? (car l) pos)))
-                           lazer-list)
-                    (place-image laser-v 32 32 image))
-                   (else image))
+             (cond ((or (= (screen-type env) 2)
+                        (not (pos=? (player-pos-in-stage env) pos)))
+                    laser-added-image)
+                   ((or (= f-timer 0) (= f-timer 4))
+                    (place-image explo1 32 32 laser-added-image))
+                   ((or (= f-timer 1) (= f-timer 3))
+                    (place-image explo2 32 32 laser-added-image))
+                   (else
+                    (place-image explo3 32 32 laser-added-image)))
              (make-row (cdr row) (cons (+ (car pos) 1) (cdr pos)))))))
     (define (make-col col pos)
       (if (null? col)
@@ -528,14 +536,20 @@
           (cons (make-posn x y)
                 (make-row (cdr row) (+ x SQUARE) y))))
     (define (make-col col y)
+      (define dx (cond ((or (= f-timer 2) (= f-timer 4)) 8)
+                       ((or (= f-timer 1) (= f-timer 3)) -8)
+                       (else 0)))
       (if (null? col)
           '()
           (append (make-row (car col)
-                            (/ (+ (- SCENE-WIDTH field-width) SQUARE) 2)
+                            (/ (+ (- SCENE-WIDTH field-width) SQUARE dx) 2)
                             y)
                   (make-col (cdr col) (+ y SQUARE)))))
+    (define dy (cond ((or (= f-timer 3) (= f-timer 4)) -8)
+                     ((or (= f-timer 1) (= f-timer 2)) 8)
+                     (else 0)))
     (make-col field-data
-              (/ (+ (- SCENE-HEIGHT field-height) SQUARE) 2)))
+              (/ (+ (- SCENE-HEIGHT field-height) SQUARE dy) 2)))
   (define map-field
     (place-images (map-image-list)
                   (map-pos-list)
@@ -737,6 +751,11 @@
                             (object-move (car move-object-list) n))
                       (cdr move-object-list)
                       (+ n 1))))
+  (define (fail-check env)
+    (if (and (= (screen-type env) 2)
+             (<= (car (stage-state-list env)) 0))
+        (fail-process env)
+        env))
   (define (eaten-check env)
     (if (eq? (take-element2 (cadddr (stage-state-list env))
                             (player-pos-in-stage env))
@@ -751,17 +770,26 @@
   (cond ((string=? key "p") (edit env screen 3))
         ((string=? key "r") (init-stage env))
         ((dir? key)
-         (cond
-           ((and (null? move-object-list) (null? device-list))
-            (player-move env))
-           (else
-            (burnt-check
-             (eaten-check
-              (objects-move (player-move env) move-object-list 0))))))
+         (fail-check
+          (cond
+            ((and (null? move-object-list) (null? device-list))
+             (player-move env))
+            (else
+             (burnt-check
+              (eaten-check
+               (objects-move (player-move env) move-object-list 0)))))))
         (else env)))
 
+(define (tick-process env)
+  (define f-timer (fail-timer env))
+  (cond ((not (= (screen-type env) 4)) env)
+        ((zero? f-timer) (init-stage (edit env screen 2)))
+        (else (edit env 6 (- f-timer 1)))))
+
 (define (fail-process env)
-  (init-stage env))
+  (edit env
+        screen 4
+        6 4))
 
 (define (recalc-lazer state-list)
   (define field-data (take-element state-list 3))
