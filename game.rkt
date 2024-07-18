@@ -100,7 +100,10 @@
 (define iron-block (bitmap/file "iron-barred-block.png"))
 (define grass (bitmap/file "green-grass.png"))
 (define plus1 (bitmap/file "plus1.png"))
+(define plus3 (bitmap/file "plus3.png"))
+(define plus5 (bitmap/file "plus5.png"))
 (define minus1 (bitmap/file "minus1.png"))
+(define minus2 (bitmap/file "minus2.png"))
 (define pushobject (bitmap/file "wooden-box.png"))
 (define limit (bitmap/file "limit.png"))
 (define goal (bitmap/file "goal-flag.png"))
@@ -269,9 +272,9 @@
      (0 w 0 w 0 0  0 0 0  0 0  0 0 0    )
      (0 w 0 w w w  0 0 Il 0 Ir 0 0 w    )
      (0 w 0 l 0 w  0 0 0  0 0  0 0 0    )
-     (k w 0 w 0 w  0 0 0  0 0  0 0 0    )
-     (w w d w 0 w  w 0 0  0 0  0 0 0    )
-     (0 0 0 r u 0  L 0 0  0 0  0 0 0    )
+     (k w 0 w 0 w  0 0 0  0 0  0 0 (x 5))
+     (w w d w 0 w  w 0 0  0 0  0 0 (x 3))
+     (0 0 0 r u 0  L 0 0  0 0  0 0 (x -2))
      (0 0 0 w w w  w 0 0  0 0  0 0 0    )
      (w w 0 0 0 ju 0 0 0  0 0  0 0 0    )
      (i 0 w 0 0 0  0 0 0  0 0  0 0 0    )
@@ -426,7 +429,14 @@
                     ((pos=? (player-pos-in-stage env) pos) smile)
                     ((list? c)
                      (cond
-                       ((eq? (car c) 's) (place-image switch 32 32 ground))))
+                       ((eq? (car c) 's)
+                        (place-image switch 32 32 ground))
+                       ((and (eq? (car c) 'x) (= (cadr c) 3))
+                        (place-image plus3 32 32 ground))
+                       ((and (eq? (car c) 'x) (= (cadr c) 5))
+                        (place-image plus5 32 32 ground))
+                       ((and (eq? (car c) 'x) (= (cadr c) -2))
+                        (place-image minus2 32 32 ground))))
                     ((eq? c 'w) wall)
                     ((eq? c 'b) empty-image)
                     ((eq? c '+) (place-image plus1 32 32 ground))
@@ -561,7 +571,14 @@
                            (edit stage-env
                                  3 ((take-element switch-func-list
                                                   (cadr gimmick))
-                                    field-data)))))))
+                                    field-data)))))
+             ((eq? (car gimmick) 'x)
+              (edit env
+                    pos new-pos
+                    stage (edit stage-env
+                                0 (+ (car stage-env) (- (cadr gimmick) 1))
+                                3 (change-element2 field-data
+                                                   new-pos '0))))))
           ((or (eq? gimmick 'w)
                (eq? gimmick 'b)
                (eq? gimmick 'Iu)
