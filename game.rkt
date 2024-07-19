@@ -114,6 +114,7 @@
 (define minus1 (bitmap/file "minus1.png"))
 (define minus2 (bitmap/file "minus2.png"))
 (define pushobject (bitmap/file "wooden-box.png"))
+(define folder (bitmap/file "folder.png"))
 (define limit (bitmap/file "limit.png"))
 (define goal (bitmap/file "goal-flag.png"))
 (define key (bitmap/file "key.png"))
@@ -228,7 +229,7 @@
     ()
     ()))
 (define map-data-3
-  `(43
+  `(45
     0
     (0 . 0)
     (10 . 8)
@@ -494,6 +495,10 @@
         (cond ((= (stage-selecting env) 2) wall2)
               ((= (stage-selecting env) 3) wall3)
               (else iron-block)))
+      (define push-o
+        (cond ((= (stage-selecting env) 3)
+               (place-image folder 32 32 ground))
+              (else pushobject)))
       (if (null? row)
           '()
           (let* ((c (car row))
@@ -516,7 +521,7 @@
                     ((eq? c 'b) blank)
                     ((eq? c '+) (place-image plus1 32 32 ground))
                     ((eq? c '-) (place-image minus1 32 32 ground))
-                    ((eq? c 'o) pushobject)
+                    ((eq? c 'o) push-o)
                     ((eq? c 'u) (place-image limit 32 32 ground))
                     ((eq? c 'd) (place-image (rotate 180 limit) 32 32 ground))
                     ((eq? c 'r) (place-image (rotate 270 limit) 32 32 ground))
@@ -660,10 +665,11 @@
              ((eq? (car gimmick) 's)
               (edit env
                     pos new-pos
-                    stage (recalc-lazer
+                    stage (edit (recalc-lazer
                            ((take-element switch-func-list
                                                   (cadr gimmick))
-                                    stage-env))))
+                            stage-env))
+                                0 (dec-remain-act 1))))
              ((eq? (car gimmick) 'x)
               (edit env
                     pos new-pos
