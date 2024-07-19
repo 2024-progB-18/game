@@ -1,7 +1,5 @@
-
 #lang racket
-(require reactor)
-(require "reactor-lib.rkt")
+(require (only-in racket/gui play-sound))
 (require 2htdp/image)
 (require 2htdp/universe)
 (require lang/posn)
@@ -20,7 +18,7 @@
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
-  (list 0 0 (cons 0 0) '() (list 1 380) (list 0) 5))
+  (list 0 0 (cons 0 0) '() (list 1 380) (list 0) 5 0))
 (define (screen-type env) (car env))
 (define (stage-selecting env) (cadr env))
 (define (player-pos-in-stage env) (caddr env))
@@ -28,6 +26,7 @@
 (define (pause-state-list env) (car (cddddr env)))
 (define (stage-result env) (cadr (cddddr env)))
 (define (fail-timer env) (caddr (cddddr env)))
+(define (player-timer env) (cadddr (cddddr env)))
 
 (define screen 0)
 (define select 1)
@@ -124,6 +123,9 @@
 (define explo1 (bitmap/file "explo1.png"))
 (define explo2 (bitmap/file "explo2.png"))
 (define explo3 (bitmap/file "explo3.png"))
+
+(define explo-step "explo-step.mp3")
+(define explo-laser "explo-laser.mp3")
 
 ;;ステージデータ
 (define (init-step-remain map-data) (car map-data))
@@ -446,8 +448,17 @@
   (define field-data (cadddr (stage-state-list env)))
   (define lazer-list (take-element (stage-state-list env) 7))
   (define f-timer (fail-timer env))
+  (define p-timer (player-timer env))
   (define (map-image-list)
     (define (make-row row pos)
+      (define player-image
+        (if (= (stage-selecting env) -1)
+            (cond ((= p-timer 0) smile)
+                  ((= p-timer 1) smile)
+                  (else smile))
+            (cond ((= p-timer 0) smile)
+                  ((= p-timer 1) smile)
+                  (else smile))))
       (define ground
         (cond ((= (stage-selecting env) 1) floor1)
               ((= (stage-selecting env) 2) floor2)
@@ -467,7 +478,7 @@
                   (cond
                     ((and (= (screen-type env) 2)
                           (pos=? (player-pos-in-stage env) pos))
-                     smile)
+                     player-image)
                     ((list? c)
                      (cond
                        ((eq? (car c) 's)
@@ -754,18 +765,18 @@
   (define (fail-check env)
     (if (and (= (screen-type env) 2)
              (<= (car (stage-state-list env)) 0))
-        (fail-process env)
+        (fail-process env 'step)
         env))
   (define (eaten-check env)
     (if (eq? (take-element2 (cadddr (stage-state-list env))
                             (player-pos-in-stage env))
              'e)
-        (fail-process env)
+        (fail-process env 'step)
         env))
   (define (burnt-check env)
     (if (ormap (lambda (l) (pos=? (player-pos-in-stage env) (car l)))
                (take-element (stage-state-list env) 7))
-        (fail-process env)
+        (fail-process env 'laser)
         env))
   (cond ((string=? key "p") (edit env screen 3))
         ((string=? key "r") (init-stage env))
@@ -786,7 +797,9 @@
         ((zero? f-timer) (init-stage (edit env screen 2)))
         (else (edit env 6 (- f-timer 1)))))
 
-(define (fail-process env)
+(define (fail-process env type)
+  (cond ((eq? type 'step) (play-sound explo-step #t))
+        ((eq? type 'laser) (play-sound explo-laser #t)))
   (edit env
         screen 4
         6 4))
