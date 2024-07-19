@@ -416,7 +416,8 @@
                                                                                   x2 y3
                                                                                   (place-image (text "stage 6" 64 "black")
                                                                                                x3 y3
-                                                                                               (place-image (circle 30 "solid" "black")
+                                                                                               ;; (place-image (circle 30 "solid" "black")
+                                                                                               (place-image (text ">" 100 "black")
                                                                                                             (- xn 150)
                                                                                                             yn
                                                                                                             SCENE ))))))))))
