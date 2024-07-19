@@ -236,10 +236,10 @@
      (Ir 0 w 0 0 0 (s 0) 0 b b)
      (w (x 3) 0 0 0 0 b 0 Il b)
      (0 (s 0) 0 r 0 0 b 0 0 0)
-     (0 0 0 w 0 0 0 0 b 0)
-     (0 w w w 0 0 w 0 b 0)
+     (0 0 0 w 0 0 (s 0) 0 b 0)
+     (0 w w w 0 0 (s 0) 0 b 0)
      (0 0 0 w 0 0 w 0 b L)
-     (k w 0 (x -2) l 0 w (x 5) w g))
+     (k w 0 (x -2) l w w (x 5) w g))
     ()
     (,(lambda (s-data)
         (edit s-data
@@ -248,17 +248,23 @@
                (change-element2
                 (change-element2
                  (change-element2
-                  (change-element2 (take-element s-data 3) '(6 . 1) '(s 1))
-                  '(1 . 3) '(s 1))
-                 '(8 . 2) 'Id)
-                '(5 . 0) 'Id)
-               '(0 . 1) 'Id)
+                  (change-element2
+                   (change-element2
+                    (change-element2 (take-element s-data 3) '(6 . 1) '(s 1))
+                    '(1 . 3) '(s 1))
+                   '(8 . 2) 'Id)
+                  '(5 . 0) 'Id)
+                 '(0 . 1) 'Id)
+                '(6 . 4) '(s 1))
+               '(6 . 5) '(s 1))
               6
               '((#t (8 . 2) d) (#t (5 . 0) d) (#t (0 . 1) d))))
      ,(lambda (s-data)
         (edit s-data
               3
               (change-element2
+               (change-element2
+               (change-element2
                (change-element2
                 (change-element2
                  (change-element2
@@ -267,6 +273,8 @@
                  '(8 . 2) 'Il)
                 '(5 . 0) 'Il)
                '(0 . 1) 'Ir)
+               '(6 . 4) '(s 0))
+               '(6 . 5) '(s 0))
               6
               '((#t (8 . 2) l) (#t (5 . 0) l) (#t (0 . 1) r)))))
     ((#t (8 . 2) l) (#t (5 . 0) l) (#t (0 . 1) r))
