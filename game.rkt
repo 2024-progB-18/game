@@ -102,6 +102,10 @@
 (define wall3 (bitmap/file "wall3.png"))
 (define blank (bitmap/file "blank.png"))
 (define smile (bitmap/file "smile.png"))
+(define kadaikun0 (bitmap/file "player0.png"))
+(define kadaikun1 (bitmap/file "player1.png"))
+(define kadaikun2 (bitmap/file "player2.png"))
+(define kadaikun3 (bitmap/file "player3.png"))
 (define iron-block (bitmap/file "iron-barred-block.png"))
 (define grass (bitmap/file "green-grass.png"))
 (define plus1 (bitmap/file "plus1.png"))
@@ -228,36 +232,44 @@
     0
     (0 . 0)
     (10 . 8)
-    ((0 0 0 0 0 b b b b b)
-     (0 0 0 0 0 r (s 0) 0 b b)
+    ((0 o 0 0 Il b b b b b)
+     (Ir 0 w 0 0 0 (s 0) 0 b b)
      (w (x 3) 0 0 0 0 b 0 Il b)
-     (0 0 (s 0) r 0 0 b 0 0 0)
+     (0 (s 0) 0 r 0 0 b 0 0 0)
      (0 0 0 w 0 0 0 0 b 0)
      (0 w w w 0 0 w 0 b 0)
-     (L 0 0 w 0 0 w 0 b L)
-     (k w k (x -2) l 0 w (x 5) w g))
+     (0 0 0 w 0 0 w 0 b L)
+     (k w 0 (x -2) l 0 w (x 5) w g))
     ()
     (,(lambda (s-data)
         (edit s-data
               3
               (change-element2
                (change-element2
-                (change-element2 (take-element s-data 3) '(6 . 1) '(s 1))
-                '(2 . 3) '(s 1))
-               '(8 . 2) 'Id)
+                (change-element2
+                 (change-element2
+                  (change-element2 (take-element s-data 3) '(6 . 1) '(s 1))
+                  '(1 . 3) '(s 1))
+                 '(8 . 2) 'Id)
+                '(5 . 0) 'Id)
+               '(0 . 1) 'Id)
               6
-              '((#t (8 . 2) d))))
+              '((#t (8 . 2) d) (#t (5 . 0) d) (#t (0 . 1) d))))
      ,(lambda (s-data)
         (edit s-data
               3
               (change-element2
                (change-element2
-                (change-element2 (take-element s-data 3) '(6 . 1) '(s 0))
-                '(2 . 3) '(s 0))
-               '(8 . 2) 'Il)
+                (change-element2
+                 (change-element2
+                  (change-element2 (take-element s-data 3) '(6 . 1) '(s 0))
+                  '(1 . 3) '(s 0))
+                 '(8 . 2) 'Il)
+                '(5 . 0) 'Il)
+               '(0 . 1) 'Ir)
               6
-              '((#t (8 . 2) l)))))
-    ((#t (8 . 2) l))
+              '((#t (8 . 2) l) (#t (5 . 0) l) (#t (0 . 1) r)))))
+    ((#t (8 . 2) l) (#t (5 . 0) l) (#t (0 . 1) r))
     ()))
 (define map-data-4
   '(99
@@ -456,9 +468,11 @@
             (cond ((= p-timer 0) smile)
                   ((= p-timer 1) smile)
                   (else smile))
-            (cond ((= p-timer 0) smile)
-                  ((= p-timer 1) smile)
-                  (else smile))))
+            (cond ((= p-timer 0) kadaikun0)
+                  ((= p-timer 1) kadaikun1)
+                  ((= p-timer 2) kadaikun2)
+                  ((= p-timer 3) kadaikun3)
+                  (else kadaikun3))))
       (define ground
         (cond ((= (stage-selecting env) 1) floor1)
               ((= (stage-selecting env) 2) floor2)
@@ -793,7 +807,10 @@
 
 (define (tick-process env)
   (define f-timer (fail-timer env))
-  (cond ((not (= (screen-type env) 4)) env)
+  (define p-timer (player-timer env))
+  (cond ((and (= (screen-type env) 2) (= p-timer 3)) (edit env 7 0))
+        ((= (screen-type env) 2) (edit env 7 (+ p-timer 1)))
+        ((not (= (screen-type env) 4)) env)
         ((zero? f-timer) (init-stage (edit env screen 2)))
         (else (edit env 6 (- f-timer 1)))))
 
