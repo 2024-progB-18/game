@@ -595,6 +595,8 @@
       (define push-o
         (cond ((= (stage-selecting env) 3)
                (place-image folder 32 32 ground))
+              ((= (stage-selecting env) 4)
+               (place-image folder 32 32 ground))
               (else pushobject)))
       (if (null? row)
           '()
