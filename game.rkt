@@ -95,9 +95,13 @@
 (define stage1 (bitmap/file "stage1.png"))
 (define stage2 (bitmap/file "stage2.png"))
 (define stage3 (bitmap/file "stage3.png"))
+(define stage4 (bitmap/file "stage4.png"))
+(define stage5 (bitmap/file "stage5.png"))
 (define floor1 (bitmap/file "floor1.png"))
 (define floor2 (bitmap/file "lib-floor.png"))
 (define floor3 (bitmap/file "webclass-tile1.png"))
+(define floor4 (bitmap/file "webclass-tile2.png"))
+(define mars (bitmap/file "mars.png"))
 (define wall2 (bitmap/file "lib-book.png"))
 (define wall3 (bitmap/file "wall3.png"))
 (define blank (bitmap/file "blank.png"))
@@ -123,11 +127,15 @@
 (define rev-switch (bitmap/file "rev-switch.png"))
 (define jump (bitmap/file "jump-pad.png"))
 (define device (bitmap/file "laser-device.png"))
+(define off (bitmap/file "off-device.png"))
 (define laser-h (bitmap/file "laser-horizontal.png"))
 (define laser-v (bitmap/file "laser-vertical.png"))
 (define explo1 (bitmap/file "explo1.png"))
 (define explo2 (bitmap/file "explo2.png"))
 (define explo3 (bitmap/file "explo3.png"))
+(define move (bitmap/file "move.png"))
+(define alien1 (bitmap/file "alien1.png"))
+(define alien2 (bitmap/file "alien2.png"))
 
 (define explo-step "explo-step.mp3")
 (define explo-laser "explo-laser.mp3")
@@ -194,7 +202,9 @@
                     (change-element2
                      (change-element2
                       (change-element2
-                       (change-element2 (take-element s-data 3) '(5 . 0) '(s 1))
+                       (change-element2
+                        (take-element s-data 3)
+                        '(5 . 0) '(s 1))
                        '(2 . 1) '(s 1))
                       '(0 . 5) '(s 1))
                      '(2 . 2) 'd)
@@ -216,7 +226,9 @@
                     (change-element2
                      (change-element2
                       (change-element2
-                       (change-element2 (take-element s-data 3) '(5 . 0) '(s 0))
+                       (change-element2
+                        (take-element s-data 3)
+                        '(5 . 0) '(s 0))
                        '(2 . 1) '(s 0))
                       '(0 . 5) '(s 0))
                      '(2 . 2) 'u)
@@ -240,7 +252,7 @@
      (0 0 0 w 0 0 (s 0) 0 b 0)
      (0 w w w 0 0 (s 0) 0 b 0)
      (0 0 0 w 0 0 w 0 b L)
-     (k w 0 (x -2) l w w (x 5) w g))
+     (k w 0 (x -2) l 0 w (x 5) w g))
     ()
     (,(lambda (s-data)
         (edit s-data
@@ -251,7 +263,9 @@
                  (change-element2
                   (change-element2
                    (change-element2
-                    (change-element2 (take-element s-data 3) '(6 . 1) '(s 1))
+                    (change-element2
+                     (take-element s-data 3)
+                     '(6 . 1) '(s 1))
                     '(1 . 3) '(s 1))
                    '(8 . 2) 'Id)
                   '(5 . 0) 'Id)
@@ -269,7 +283,9 @@
                (change-element2
                 (change-element2
                  (change-element2
-                  (change-element2 (take-element s-data 3) '(6 . 1) '(s 0))
+                  (change-element2
+                   (take-element s-data 3)
+                   '(6 . 1) '(s 0))
                   '(1 . 3) '(s 0))
                  '(8 . 2) 'Il)
                 '(5 . 0) 'Il)
@@ -281,39 +297,114 @@
     ((#t (8 . 2) l) (#t (5 . 0) l) (#t (0 . 1) r))
     ()))
 (define map-data-4
-  '(99
-    0
-    (3 . 3)
-    (13 . 12)
-    ((w w w w w w w w w w w w w)
-     (w 0 0 0 0 0 w 0 0 0 0 0 w)
-     (w 0 0 0 0 0 w 0 0 0 0 0 w)
-     (w 0 0 0 0 0 w 0 0 i 0 0 w)
-     (w 0 0 0 0 0 w 0 0 0 0 0 w)
-     (w 0 0 0 0 0 w 0 0 w 0 0 w)
-     (w 0 0 0 0 0 w 0 0 0 0 0 w)
-     (w 0 0 g 0 0 w 0 0 0 0 0 w)
-     (w 0 0 0 0 0 w 0 0 0 0 0 w)
-     (w 0 0 0 0 0 w 0 0 0 0 0 w)
-     (w 0 0 0 0 0 w 0 0 0 0 0 w)
-     (w w w w w w w w w w w w w))
-    ((i (9 . 3)))
+  `(83
+    1
+    (1 . 1)
+    (19 . 11)
+    ((0 0 0 b 0 0 0 b 0 0 0 b 0 0 0 b 0 0 0)
+     (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 (s 0) 0)
+     (0 0 0 b 0 0 0 b 0 o 0 b 0 0 0 b 0 (x -2) 0)
+     (b 0 b b b b b b b 0 b b b b b b b L b)
+     (0 0 0 b k k k b 0 0 0 b 0 0 0 b 0 (x -2) 0)
+     (0 0 0 b 0 (x 5) 0 b 0 0 0 b 0 (x 5) 0 L 0 iu 0)
+     (0 0 0 b 0 (s 0) 0 b 0 0 Ir b w 0 0 b 0 0 0)
+     (b 0 b b b L b b b 0 b b b L b b b u b)
+     (0 0 0 b 0 0 Ir b 0 o 0 b 0 0 0 b b g b)
+     (0 (x 5) 0 0 0 0 0 0 0 b 0 L 0 (x 5) 0 b b b b)
+     (0 0 0 b 0 0 0 b 0 0 0 b 0 0 0 b b b b))
     ()
-    ()
+    (,(lambda (s-data)
+        (edit s-data
+              3
+              (change-element2
+               (change-element2
+                (change-element2
+                 (change-element2
+                  (change-element2
+                   (change-element2
+                    (take-element s-data 3)
+                    '(17 . 1) '(s 1))
+                   '(5 . 6) '(s 1))
+                  '(10 . 6) 'Id)
+                 '(6 . 8) 'ir)
+                '(17 . 5) 'Iu)
+               '(17 . 7) 'd)
+              6
+              '((#t (10 . 6) d) (#t (17 . 5) u))))
+     ,(lambda (s-data)
+        (edit s-data
+              3
+              (change-element2
+               (change-element2
+                (change-element2
+                 (change-element2
+                  (change-element2
+                   (change-element2
+                    (take-element s-data 3)
+                    '(17 . 1) '(s 2))
+                   '(5 . 6) '(s 2))
+                  '(10 . 6) 'Il)
+                 '(6 . 8) 'Ir)
+                '(17 . 5) 'iu)
+               '(17 . 7) 'u)
+              6
+              '((#t (10 . 6) l) (#t (6 . 8) r))))
+     ,(lambda (s-data)
+        (edit s-data
+              3
+              (change-element2
+               (change-element2
+                (change-element2
+                 (change-element2
+                  (change-element2
+                   (change-element2
+                    (take-element s-data 3)
+                    '(17 . 1) '(s 3))
+                   '(5 . 6) '(s 3))
+                  '(10 . 6) 'Iu)
+                 '(6 . 8) 'ir)
+                '(17 . 5) 'Iu)
+               '(17 . 7) 'd)
+              6
+              '((#t (10 . 6) u) (#t (17 . 5) u))))
+     ,(lambda (s-data)
+        (edit s-data
+              3
+              (change-element2
+               (change-element2
+                (change-element2
+                 (change-element2
+                  (change-element2
+                   (change-element2
+                    (take-element s-data 3)
+                    '(17 . 1) '(s 0))
+                   '(5 . 6) '(s 0))
+                  '(10 . 6) 'Ir)
+                 '(6 . 8) 'Ir)
+                '(17 . 5) 'iu)
+               '(17 . 7) 'u)
+              6
+              '((#t (10 . 6) r) (#t (6 . 8) r)))))
+    ((#t (10 . 6) r) (#t (6 . 8) r) (#f (17 . 5) u))
     ()))
 (define map-data-5
   '(99
     0
     (0 . 0)
-    (2 . 2)
-    ((0 0)
-     (0 g))
+    (12 . 7)
+    ((0 0 0 w 0 0 0 k w 0 o 0)
+     (w w jd Ir 0 0 0 0 w L 0 0)
+     (0 0 w 0 0 0 ju 0 w 0 l 0)
+     (w 0 0 0 o 0 0 0 w 0 l 0)
+     (ju w w 0 0 0 0 0 w 0 w 0)
+     (k k 0 L 0 0 0 0 w L w 0)
+     (b b b w 0 0 jr 0 0 0 w g))
     ()
     ()
-    ()
+    ((#t (3 . 1) r))
     ()))
 (define map-data-6
-  '(99
+  `(99
     0
     (0 . 0)
     (2 . 2)
@@ -345,13 +436,17 @@
         (edit s-data
               3
               (change-element2
-               (change-element2 (take-element s-data 3) '(13 . 0) '(s 1))
+               (change-element2
+                (take-element s-data 3)
+                '(13 . 0) '(s 1))
                '(13 . 1) 'w)))
      ,(lambda (s-data)
         (edit s-data
               3
               (change-element2
-               (change-element2 (take-element s-data 3) '(13 . 0) '(s 0))
+               (change-element2
+                (take-element s-data 3)
+                '(13 . 0) '(s 0))
                '(13 . 1) 0))))
     ((#t (8 . 3) l) (#t (10 . 3) r))
     ()))
@@ -473,30 +568,34 @@
   (define p-timer (player-timer env))
   (define (map-image-list)
     (define (make-row row pos)
-      (define player-image
-        (if (= (stage-selecting env) -1)
-            (cond ((= p-timer 0) smile)
-                  ((= p-timer 1) smile)
-                  (else smile))
-            (cond ((= p-timer 0) kadaikun0)
-                  ((= p-timer 1) kadaikun1)
-                  ((= p-timer 2) kadaikun2)
-                  ((= p-timer 3) kadaikun3)
-                  (else kadaikun3))))
       (define ground
         (cond ((= (stage-selecting env) 1) floor1)
               ((= (stage-selecting env) 2) floor2)
               ((= (stage-selecting env) 3) floor3)
+              ((= (stage-selecting env) 4) floor4)
+              ((= (stage-selecting env) 5) blank)
               (else grass)))
+      (define player-image
+        (if (= (stage-selecting env) -1)
+            smile
+            (place-image (cond ((= p-timer 0) kadaikun0)
+                               ((= p-timer 1) kadaikun1)
+                               ((= p-timer 2) kadaikun2)
+                               ((= p-timer 3) kadaikun3)
+                               (else kadaikun3))
+                         32 32 ground)))
       (define switch
         (cond ((= (stage-selecting env) 2) rev-switch)
               (else rev-switch)))
       (define wall
         (cond ((= (stage-selecting env) 2) wall2)
               ((= (stage-selecting env) 3) wall3)
+              ((= (stage-selecting env) 4) wall3)
               (else iron-block)))
       (define push-o
         (cond ((= (stage-selecting env) 3)
+               (place-image folder 32 32 ground))
+              ((= (stage-selecting env) 4)
                (place-image folder 32 32 ground))
               (else pushobject)))
       (if (null? row)
@@ -530,16 +629,19 @@
                     ((eq? c 'k) (place-image key 32 32 ground))
                     ((eq? c 'L) lock)
                     ((eq? c 'U) (place-image unlock 32 32 ground))
-                    ((eq? c 'i) empty-image)
                     ((eq? c 'e) empty-image)
                     ((eq? c 'ju) (place-image jump 32 32 ground))
                     ((eq? c 'jd) (place-image (rotate 180 jump) 32 32 ground))
                     ((eq? c 'jr) (place-image (rotate 270 jump) 32 32 ground))
                     ((eq? c 'jl) (place-image (rotate 90 jump) 32 32 ground))
                     ((eq? c 'Iu) (place-image device 32 32 ground))
+                    ((eq? c 'iu) (place-image off 32 32 ground))
                     ((eq? c 'Id) (place-image (rotate 180 device) 32 32 ground))
+                    ((eq? c 'id) (place-image (rotate 180 off) 32 32 ground))
                     ((eq? c 'Ir) (place-image (rotate 270 device) 32 32 ground))
+                    ((eq? c 'ir) (place-image (rotate 270 off) 32 32 ground))
                     ((eq? c 'Il) (place-image (rotate 90 device) 32 32 ground))
+                    ((eq? c 'il) (place-image (rotate 90 off) 32 32 ground))
                     (else ground)))
                  (laser-added-image
                   (cond ((ormap (lambda (l) (and (eq? (cadr l) 'h)
@@ -568,6 +670,12 @@
           (append (make-row (car col) (cons 0 pos))
                   (make-col (cdr col) (+ pos 1)))))
     (make-col field-data 0))
+  (define dx (cond ((or (= f-timer 2) (= f-timer 4)) 8)
+                       ((or (= f-timer 1) (= f-timer 3)) -8)
+                       (else 0)))
+  (define dy (cond ((or (= f-timer 3) (= f-timer 4)) -8)
+                     ((or (= f-timer 1) (= f-timer 2)) 8)
+                     (else 0)))
   (define (map-pos-list)
     (define (make-row row x y)
       (if (null? row)
@@ -575,18 +683,12 @@
           (cons (make-posn x y)
                 (make-row (cdr row) (+ x SQUARE) y))))
     (define (make-col col y)
-      (define dx (cond ((or (= f-timer 2) (= f-timer 4)) 8)
-                       ((or (= f-timer 1) (= f-timer 3)) -8)
-                       (else 0)))
       (if (null? col)
           '()
           (append (make-row (car col)
                             (/ (+ (- SCENE-WIDTH field-width) SQUARE dx) 2)
                             y)
                   (make-col (cdr col) (+ y SQUARE)))))
-    (define dy (cond ((or (= f-timer 3) (= f-timer 4)) -8)
-                     ((or (= f-timer 1) (= f-timer 2)) 8)
-                     (else 0)))
     (make-col field-data
               (/ (+ (- SCENE-HEIGHT field-height) SQUARE dy) 2)))
   (define map-field
@@ -595,6 +697,12 @@
                   (cond ((= (stage-selecting env) 1) stage1)
                         ((= (stage-selecting env) 2) stage2)
                         ((= (stage-selecting env) 3) stage3)
+                        ((= (stage-selecting env) 4) stage4)
+                        ((= (stage-selecting env) 5)
+                         (place-image mars
+                                      (/ (+ SCENE-WIDTH dx) 2)
+                                      (/ (+ SCENE-HEIGHT dy) 2)
+                                      stage5))
                         (else SCENE))))
   (define (add-step-counter image)
     (define text
@@ -660,15 +768,18 @@
     (define cur-pos (player-pos-in-stage env))
     (define new-pos (update-pos cur-pos dir))
     (define gimmick (take-element2 field-data new-pos))
-    (cond ((list? gimmick)
+    (cond ((ormap (lambda (l) (pos=? (player-pos-in-stage env) (car l)))
+                  (take-element (stage-state-list env) 7))
+           (fail-process env 'laser))
+          ((list? gimmick)
            (cond
              ((eq? (car gimmick) 's)
               (edit env
                     pos new-pos
                     stage (edit (recalc-lazer
-                           ((take-element switch-func-list
-                                                  (cadr gimmick))
-                            stage-env))
+                                 ((take-element switch-func-list
+                                                (cadr gimmick))
+                                  stage-env))
                                 0 (dec-remain-act 1))))
              ((eq? (car gimmick) 'x)
               (edit env
@@ -724,18 +835,31 @@
                env
                (edit env
                      pos new-pos
-                     stage (edit stage-env
-                                 0 (dec-remain-act 1)
-                                 1 (- key-count 1)
-                                 3 (change-element2 field-data new-pos 'U)))))
+                     stage (recalc-lazer
+                            (edit stage-env
+                                  0 (dec-remain-act 1)
+                                  1 (- key-count 1)
+                                  3 (change-element2 field-data new-pos 'U))))))
           ((eq? gimmick 'ju)
-           (edit env pos (update-pos (update-pos new-pos "up") "up")))
+           (edit env
+                 pos (update-pos (update-pos new-pos "up") "up")
+                 stage (edit stage-env
+                             0 (dec-remain-act 1))))
           ((eq? gimmick 'jd)
-           (edit env pos (update-pos (update-pos new-pos "down") "down")))
+           (edit env
+                 pos (update-pos (update-pos new-pos "down") "down")
+                 stage (edit stage-env
+                             0 (dec-remain-act 1))))
           ((eq? gimmick 'jr)
-           (edit env pos (update-pos (update-pos new-pos "right") "right")))
+           (edit env
+                 pos (update-pos (update-pos new-pos "right") "right")
+                 stage (edit stage-env
+                             0 (dec-remain-act 1))))
           ((eq? gimmick 'jl)
-           (edit env pos (update-pos (update-pos new-pos "left") "left")))
+           (edit env
+                 pos (update-pos (update-pos new-pos "left") "left")
+                 stage (edit stage-env
+                             0 (dec-remain-act 1))))
           (else
            (edit env
                  pos new-pos
@@ -838,17 +962,25 @@
 
 (define (recalc-lazer state-list)
   (define field-data (take-element state-list 3))
+  (define stage-size (take-element state-list 2))
   (define device-list (take-element state-list 6))
   (define (next-pos pos dir)
-    (cond ((eq? dir 'u) (cons (car pos) (- (cdr pos) 1)))
-          ((eq? dir 'd) (cons (car pos) (+ (cdr pos) 1)))
-          ((eq? dir 'l) (cons (- (car pos) 1) (cdr pos)))
-          ((eq? dir 'r) (cons (+ (car pos) 1) (cdr pos)))))
+    (define x (car pos))
+    (define y (cdr pos))
+    (cond ((eq? dir 'u)
+           (if (= y 0) pos (cons x (- y 1))))
+          ((eq? dir 'd)
+           (if (= y (- (cdr stage-size) 1)) pos (cons x (+ y 1))))
+          ((eq? dir 'l)
+           (if (= x 0) pos (cons (- x 1) y)))
+          ((eq? dir 'r)
+           (if (= x (- (car stage-size) 1)) pos (cons (+ x 1) y)))))
   (define (calc d-list l-list)
     (define (search pos dir result)
       (define new-pos (next-pos pos dir))
-      (if (ormap (lambda (g) (eq? (take-element2 field-data new-pos) g))
-                 '(w o L i))
+      (if (or (pos=? pos new-pos)
+              (ormap (lambda (g) (eq? (take-element2 field-data new-pos) g))
+                     '(w o L i)))
           result
           (search new-pos dir (cons (list new-pos
                                           (if (or (eq? dir 'l) (eq? dir 'r))
@@ -857,10 +989,11 @@
                                     result))))
     (if (null? d-list)
       l-list
-      (calc (cdr d-list) (if (caar d-list)
-                             (append (search (cadar d-list) (caddar d-list) '())
-                                     l-list)
-                             l-list))))
+      (calc (cdr d-list)
+            (if (caar d-list)
+                (append (search (cadar d-list) (caddar d-list) '())
+                        l-list)
+                l-list))))
   (edit state-list
         7 (calc device-list '())))
 
