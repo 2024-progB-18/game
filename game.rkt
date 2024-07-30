@@ -12,9 +12,8 @@
 ;;１マスの大きさ
 (define SQUARE 64)
 
-;;ステージの大きさ
-(define STAGE-WIDTH 30)
-(define STAGE-HEIGHT 16)
+;;実装済みの最後のステージ
+(define last-stage 5)
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
@@ -593,11 +592,13 @@
                                                   (+ (stage-selecting env) 3)))
                        (else (stage-selecting env)))))
     ;ステージ1を選択中左を押されたら6に移動
-    (cond ((> new-env 6) (set! new-env 6))
+    (cond ((> new-env last-stage) (set! new-env last-stage))
           ((< new-env 0) (set! new-env 0))
           )
     (cond ((dir? key) (edit env select new-env))
-          ((and (string=? key "\r") (not (= (stage-selecting env) 6)))
+          ((and (string=? key "\r")
+                (ormap (lambda (x) (= x (stage-selecting env)))
+                       (range (+ last-stage 1))))
            (init-stage (edit env screen 2 select new-env)))
           ((string=? key "t")
            (init-stage (edit env screen 2 select -1)))
@@ -1188,11 +1189,6 @@
        ((string=? key "3");;3を押したらRESTART
             (init-stage (edit env screen 2)));;キャラを初期位置に戻す。行動回数のリセット
        (else env)))
-   
-
-;;
-(define fail-screen
-  SCENE)
 
 ;;yuta
 (define (success-screen env)
@@ -1234,7 +1230,7 @@
     (place-image (circle 30 "solid" "black") (- cx (/ cx 3)) y s))
   (define (tri-select s)
     (place-image (text ">" 100 "black") (- cx (/ BOTTON-WIDTH 2)) (+ y (/ BOTTON-HEIGHT 16)) s))
-  (if (= (stage-selecting env) 6)
+  (if (= (stage-selecting env) last-stage)
       (tri-select (txt-returntitle (title-clear SCENE)))
       (tri-select (txt-selectstage (txt-nextstage (title-success
                                                    ;;test用 (select-print env SCENE)
@@ -1245,7 +1241,7 @@
   (define prev "up")
   (define next "down")
   (define do "\r")
-  (if (= (stage-selecting env) 6)
+  (if (= (stage-selecting env) last-stage)
       (cond ((string=? key do) WORLD-ENVIROMENT)
             (else env))  
       (cond ((= (car (stage-result env)) 0)
