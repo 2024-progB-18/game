@@ -1190,9 +1190,7 @@
        (else env)))
    
 
-;;
-(define fail-screen
-  SCENE)
+(define last-stage 5)
 
 ;;yuta
 (define (success-screen env)
@@ -1234,7 +1232,7 @@
     (place-image (circle 30 "solid" "black") (- cx (/ cx 3)) y s))
   (define (tri-select s)
     (place-image (text ">" 100 "black") (- cx (/ BOTTON-WIDTH 2)) (+ y (/ BOTTON-HEIGHT 16)) s))
-  (if (= (stage-selecting env) 6)
+  (if (= (stage-selecting env) last-stage)
       (tri-select (txt-returntitle (title-clear SCENE)))
       (tri-select (txt-selectstage (txt-nextstage (title-success
                                                    ;;test用 (select-print env SCENE)
@@ -1245,7 +1243,7 @@
   (define prev "up")
   (define next "down")
   (define do "\r")
-  (if (= (stage-selecting env) 6)
+  (if (= (stage-selecting env) last-stage)
       (cond ((string=? key do) WORLD-ENVIROMENT)
             (else env))  
       (cond ((= (car (stage-result env)) 0)
