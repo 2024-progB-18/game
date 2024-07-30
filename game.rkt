@@ -12,9 +12,8 @@
 ;;１マスの大きさ
 (define SQUARE 64)
 
-;;ステージの大きさ
-(define STAGE-WIDTH 30)
-(define STAGE-HEIGHT 16)
+;;実装済みの最後のステージ
+(define last-stage 5)
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
@@ -593,11 +592,13 @@
                                                   (+ (stage-selecting env) 3)))
                        (else (stage-selecting env)))))
     ;ステージ1を選択中左を押されたら6に移動
-    (cond ((> new-env 6) (set! new-env 6))
+    (cond ((> new-env last-stage) (set! new-env last-stage))
           ((< new-env 0) (set! new-env 0))
           )
     (cond ((dir? key) (edit env select new-env))
-          ((and (string=? key "\r") (not (= (stage-selecting env) 6)))
+          ((and (string=? key "\r")
+                (ormap (lambda (x) (= x (stage-selecting env)))
+                       (range (+ last-stage 1))))
            (init-stage (edit env screen 2 select new-env)))
           ((string=? key "t")
            (init-stage (edit env screen 2 select -1)))
@@ -1188,9 +1189,6 @@
        ((string=? key "3");;3を押したらRESTART
             (init-stage (edit env screen 2)));;キャラを初期位置に戻す。行動回数のリセット
        (else env)))
-   
-
-(define last-stage 5)
 
 ;;yuta
 (define (success-screen env)
