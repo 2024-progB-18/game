@@ -1,8 +1,8 @@
 #lang racket
-(require (only-in racket/gui play-sound))
 (require 2htdp/image)
 (require 2htdp/universe)
 (require lang/posn)
+(require (only-in racket/gui play-sound))
 
 ;;背景(外枠)スクリーンの定義
 (define SCENE-WIDTH 1280)
@@ -91,54 +91,53 @@
   (place-image (text (number->string (screen-type env)) 25 "black")
                (- SCENE-WIDTH 25) (- SCENE-HEIGHT 25) s))
 
-;;画像のロード
-(define stage1 (bitmap/file "stage1.png"))
-(define stage2 (bitmap/file "stage2.png"))
-(define stage3 (bitmap/file "stage3.png"))
-(define stage4 (bitmap/file "stage4.png"))
-(define stage5 (bitmap/file "stage5.png"))
-(define floor1 (bitmap/file "floor1.png"))
-(define floor2 (bitmap/file "lib-floor.png"))
-(define floor3 (bitmap/file "webclass-tile1.png"))
-(define floor4 (bitmap/file "webclass-tile2.png"))
-(define mars (bitmap/file "mars.png"))
-(define wall2 (bitmap/file "lib-book.png"))
-(define wall3 (bitmap/file "wall3.png"))
-(define blank (bitmap/file "blank.png"))
-(define smile (bitmap/file "smile.png"))
-(define kadaikun0 (bitmap/file "player0.png"))
-(define kadaikun1 (bitmap/file "player1.png"))
-(define kadaikun2 (bitmap/file "player2.png"))
-(define kadaikun3 (bitmap/file "player3.png"))
-(define iron-block (bitmap/file "iron-barred-block.png"))
-(define grass (bitmap/file "green-grass.png"))
-(define plus1 (bitmap/file "plus1.png"))
-(define plus3 (bitmap/file "plus3.png"))
-(define plus5 (bitmap/file "plus5.png"))
-(define minus1 (bitmap/file "minus1.png"))
-(define minus2 (bitmap/file "minus2.png"))
-(define pushobject (bitmap/file "wooden-box.png"))
-(define folder (bitmap/file "folder.png"))
-(define limit (bitmap/file "limit.png"))
-(define goal (bitmap/file "goal-flag.png"))
-(define key (bitmap/file "key.png"))
-(define lock (bitmap/file "lock.png"))
-(define unlock (bitmap/file "unlock.png"))
-(define rev-switch (bitmap/file "rev-switch.png"))
-(define jump (bitmap/file "jump-pad.png"))
-(define device (bitmap/file "laser-device.png"))
-(define off (bitmap/file "off-device.png"))
-(define laser-h (bitmap/file "laser-horizontal.png"))
-(define laser-v (bitmap/file "laser-vertical.png"))
-(define explo1 (bitmap/file "explo1.png"))
-(define explo2 (bitmap/file "explo2.png"))
-(define explo3 (bitmap/file "explo3.png"))
-(define move (bitmap/file "move.png"))
-(define alien1 (bitmap/file "alien1.png"))
-(define alien2 (bitmap/file "alien2.png"))
-
-(define explo-step "explo-step.mp3")
-(define explo-laser "explo-laser.mp3")
+;;画像と音声のロード
+(define stage1 (bitmap/file "resources/stage1.png"))
+(define stage2 (bitmap/file "resources/stage2.png"))
+(define stage3 (bitmap/file "resources/stage3.png"))
+(define stage4 (bitmap/file "resources/stage4.png"))
+(define stage5 (bitmap/file "resources/stage5.png"))
+(define floor1 (bitmap/file "resources/floor1.png"))
+(define floor2 (bitmap/file "resources/lib-floor.png"))
+(define floor3 (bitmap/file "resources/webclass-tile1.png"))
+(define floor4 (bitmap/file "resources/webclass-tile2.png"))
+(define mars (bitmap/file "resources/mars.png"))
+(define wall2 (bitmap/file "resources/lib-book.png"))
+(define wall3 (bitmap/file "resources/wall3.png"))
+(define blank (bitmap/file "resources/blank.png"))
+(define smile (bitmap/file "resources/smile.png"))
+(define kadaikun0 (bitmap/file "resources/player0.png"))
+(define kadaikun1 (bitmap/file "resources/player1.png"))
+(define kadaikun2 (bitmap/file "resources/player2.png"))
+(define kadaikun3 (bitmap/file "resources/player3.png"))
+(define iron-block (bitmap/file "resources/iron-barred-block.png"))
+(define grass (bitmap/file "resources/green-grass.png"))
+(define plus1 (bitmap/file "resources/plus1.png"))
+(define plus3 (bitmap/file "resources/plus3.png"))
+(define plus5 (bitmap/file "resources/plus5.png"))
+(define minus1 (bitmap/file "resources/minus1.png"))
+(define minus2 (bitmap/file "resources/minus2.png"))
+(define minus5 (bitmap/file "resources/minus5.png"))
+(define pushobject (bitmap/file "resources/wooden-box.png"))
+(define folder (bitmap/file "resources/folder.png"))
+(define limit (bitmap/file "resources/limit.png"))
+(define goal (bitmap/file "resources/goal-flag.png"))
+(define key (bitmap/file "resources/key.png"))
+(define lock (bitmap/file "resources/lock.png"))
+(define unlock (bitmap/file "resources/unlock.png"))
+(define rev-switch (bitmap/file "resources/rev-switch.png"))
+(define jump (bitmap/file "resources/jump-pad.png"))
+(define device (bitmap/file "resources/laser-device.png"))
+(define off (bitmap/file "resources/off-device.png"))
+(define laser-h (bitmap/file "resources/laser-horizontal.png"))
+(define laser-v (bitmap/file "resources/laser-vertical.png"))
+(define explo1 (bitmap/file "resources/explo1.png"))
+(define explo2 (bitmap/file "resources/explo2.png"))
+(define explo3 (bitmap/file "resources/explo3.png"))
+(define alien1 (bitmap/file "resources/alien1.png"))
+(define alien2 (bitmap/file "resources/alien2.png"))
+(define explo-step "resources/explo-step.mp3")
+(define explo-laser "resources/explo-laser.mp3")
 
 ;;ステージデータ
 (define (init-step-remain map-data) (car map-data))
@@ -297,7 +296,7 @@
     ((#t (8 . 2) l) (#t (5 . 0) l) (#t (0 . 1) r))
     ()))
 (define map-data-4
-  `(83
+  `(164
     1
     (1 . 1)
     (19 . 11)
@@ -306,7 +305,7 @@
      (0 0 0 b 0 0 0 b 0 o 0 b 0 0 0 b 0 (x -2) 0)
      (b 0 b b b b b b b 0 b b b b b b b L b)
      (0 0 0 b k k k b 0 0 0 b 0 0 0 b 0 (x -2) 0)
-     (0 0 0 b 0 (x 5) 0 b 0 0 0 b 0 (x 5) 0 L 0 iu 0)
+     (0 (x 5) 0 b 0 (x 5) 0 b 0 b 0 b 0 (x 5) 0 L 0 iu 0)
      (0 0 0 b 0 (s 0) 0 b 0 0 Ir b w 0 0 b 0 0 0)
      (b 0 b b b L b b b 0 b b b L b b b u b)
      (0 0 0 b 0 0 Ir b 0 o 0 b 0 0 0 b b g b)
@@ -388,7 +387,7 @@
     ((#t (10 . 6) r) (#t (6 . 8) r) (#f (17 . 5) u))
     ()))
 (define map-data-5
-  '(99
+  '(46
     0
     (0 . 0)
     (12 . 7)
@@ -396,24 +395,70 @@
      (w w jd Ir 0 0 0 0 w L 0 0)
      (0 0 w 0 0 0 ju 0 w 0 l 0)
      (w 0 0 0 o 0 0 0 w 0 l 0)
-     (ju w w 0 0 0 0 0 w 0 w 0)
+     (ju w w 0 0 0 0 e1 w 0 l e2)
      (k k 0 L 0 0 0 0 w L w 0)
      (b b b w 0 0 jr 0 0 0 w g))
     ()
     ()
     ((#t (3 . 1) r))
-    ()))
+    (((7 . 4) 0 n ((7 . 4) (7 . 5) (7 . 6)))
+     ((11 . 4) 2 p ((11 . 2) (11 . 3) (11 . 4) (11 . 5))))))
 (define map-data-6
-  `(99
+  `(97
     0
-    (0 . 0)
-    (2 . 2)
-    ((0 0)
-     (0 g))
+    (16 . 2)
+    (17 . 10)
+    ((g L 0 l (x -5) L 0 l (s 4) L 0 0 0 w k 0 0)
+     (L L 0 w w w 0 w w 0 l 0 0 0 w w (s 0))
+     (L 0 e1 l (x 5) L 0 l (s 3) L Ir 0 0 w 0 (s 1) 0)
+     (w w w w w w w w w w w Id 0 0 0 w (s 1))
+     (0 0 0 0 0 0 0 0 0 0 0 0 l 0 w 0 e1)
+     (0 w o o o o u o w w 0 0 0 0 (s 0) 0 e2)
+     (0 w 0 0 0 e2 0 0 0 w 0 0 0 o 0 w w)
+     (0 0 w w 0 e1 0 0 0 w 0 0 0 0 w b b)
+     (b 0 0 w o o o iu w w w w w w b b b)
+     (b b 0 0 0 0 0 0 (s 0) b b b b b b b b))
     ()
-    ()
-    ()
-    ()))
+    (,(lambda (s-data)
+        (edit s-data
+              3 (change-element2 (take-element s-data 3) '(14 . 0) 0)))
+     ,(lambda (s-data)
+        (edit s-data
+              3
+              (change-element2
+               (change-element2
+                (change-element2
+                 (change-element2
+                  (change-element2
+                   (take-element s-data 3)
+                   '(13 . 0) 'w)
+                  '(13 . 2) 0)
+                 '(14 . 5) 0)
+                '(15 . 2) '(s 2))
+               '(16 . 3) '(s 2))))
+     ,(lambda (s-data)
+        (edit s-data
+              3
+              (change-element2
+               (change-element2
+                (change-element2
+                 (change-element2
+                  (change-element2
+                   (take-element s-data 3)
+                   '(13 . 0) 0)
+                  '(13 . 2) 'w)
+                 '(14 . 5) 'w)
+                '(15 . 2) '(s 1))
+               '(16 . 3) '(s 1))))
+     ,(lambda (s-data)
+        (edit s-data
+              3 (change-element2 (take-element s-data 3) '(6 . 1) '(x -5))))
+     ,(lambda (s-data)
+        (edit s-data
+              3 (change-element2 (take-element s-data 3) '(6 . 1) '(x 5)))))
+    ((#t (10 . 2) r) (#t (11 . 3) d))
+    (((16 . 4) 0 n ((16 . 4) (16 . 5) (15 . 5) (15 . 4)))
+     ((16 . 5) 0 n ((16 . 5) (15 . 5) (15 . 4) (16 . 4))))))
 (define map-data-test
   `(99
     0
@@ -530,7 +575,7 @@
                                                                      x1 y3                                                              
                                                                      (place-image (text "stage 5" 64 "black")
                                                                                   x2 y3
-                                                                                  (place-image (text "stage 6" 64 "black")
+                                                                                  (place-image (text "stage 6" 64 "gray")
                                                                                                x3 y3
                                                                                                ;; (place-image (circle 30 "solid" "black")
                                                                                                (place-image (text ">" 100 "black")
@@ -552,7 +597,7 @@
           ((< new-env 0) (set! new-env 0))
           )
     (cond ((dir? key) (edit env select new-env))
-          ((string=? key "\r")
+          ((and (string=? key "\r") (not (= (stage-selecting env) 6)))
            (init-stage (edit env screen 2 select new-env)))
           ((string=? key "t")
            (init-stage (edit env screen 2 select -1)))
@@ -615,7 +660,9 @@
                        ((and (eq? (car c) 'x) (= (cadr c) 5))
                         (place-image plus5 32 32 ground))
                        ((and (eq? (car c) 'x) (= (cadr c) -2))
-                        (place-image minus2 32 32 ground))))
+                        (place-image minus2 32 32 ground))
+                       ((and (eq? (car c) 'x) (= (cadr c) -5))
+                        (place-image minus5 32 32 ground))))
                     ((eq? c 'w) wall)
                     ((eq? c 'b) blank)
                     ((eq? c '+) (place-image plus1 32 32 ground))
@@ -629,7 +676,8 @@
                     ((eq? c 'k) (place-image key 32 32 ground))
                     ((eq? c 'L) lock)
                     ((eq? c 'U) (place-image unlock 32 32 ground))
-                    ((eq? c 'e) empty-image)
+                    ((eq? c 'e1) (place-image alien1 32 32 ground))
+                    ((eq? c 'e2) (place-image alien2 32 32 ground))
                     ((eq? c 'ju) (place-image jump 32 32 ground))
                     ((eq? c 'jd) (place-image (rotate 180 jump) 32 32 ground))
                     ((eq? c 'jr) (place-image (rotate 270 jump) 32 32 ground))
@@ -768,32 +816,32 @@
     (define cur-pos (player-pos-in-stage env))
     (define new-pos (update-pos cur-pos dir))
     (define gimmick (take-element2 field-data new-pos))
-    (cond ((ormap (lambda (l) (pos=? (player-pos-in-stage env) (car l)))
+    (cond ((eaten? (edit env pos new-pos))
+           (fail-process (edit env pos new-pos) 'step))
+          ((ormap (lambda (l) (pos=? new-pos (car l)))
                   (take-element (stage-state-list env) 7))
-           (fail-process env 'laser))
+           (fail-process (edit env pos new-pos) 'laser))
           ((list? gimmick)
            (cond
              ((eq? (car gimmick) 's)
               (edit env
                     pos new-pos
-                    stage (edit (recalc-lazer
-                                 ((take-element switch-func-list
-                                                (cadr gimmick))
-                                  stage-env))
+                    stage (edit (enemy-move
+                                 (recalc-lazer
+                                  ((take-element switch-func-list
+                                                 (cadr gimmick))
+                                   stage-env)))
                                 0 (dec-remain-act 1))))
              ((eq? (car gimmick) 'x)
               (edit env
                     pos new-pos
-                    stage (edit stage-env
-                                0 (+ (car stage-env) (- (cadr gimmick) 1))
-                                3 (change-element2 field-data
-                                                   new-pos '0))))))
-          ((or (eq? gimmick 'w)
-               (eq? gimmick 'b)
-               (eq? gimmick 'Iu)
-               (eq? gimmick 'Id)
-               (eq? gimmick 'Il)
-               (eq? gimmick 'Ir)
+                    stage (enemy-move
+                           (edit stage-env
+                                 0 (+ (car stage-env) (- (cadr gimmick) 1))
+                                 3 (change-element2 field-data
+                                                    new-pos '0)))))))
+          ((or (ormap (lambda (g) (eq? gimmick g))
+                      '(w b Iu Id Il Ir iu id il iu))
                (pos=? cur-pos new-pos)
                (and (eq? gimmick 'u) (string=? dir "down"))
                (and (eq? gimmick 'd) (string=? dir "up"))
@@ -802,21 +850,24 @@
            env)
           ((eq? gimmick '+)
            (edit env
-                 pos new-pos))
+                 pos new-pos
+                 stage (enemy-move stage-env)))
           ((eq? gimmick '-)
            (edit env
                  pos new-pos
-                 stage (edit stage-env 0 (dec-remain-act 2))))
+                 stage (enemy-move
+                        (edit stage-env 0 (dec-remain-act 2)))))
           ((eq? gimmick 'o)
            (define next-pos (update-pos new-pos dir))
            (if (eq? (take-element2 field-data next-pos) 0)
                (edit env
-                     stage (recalc-lazer
-                            (edit stage-env
-                                  0 (dec-remain-act 1)
-                                  3 (change-element2
-                                     (change-element2 field-data new-pos 0)
-                                     next-pos 'o))))
+                     stage (enemy-move
+                            (recalc-lazer
+                             (edit stage-env
+                                   0 (dec-remain-act 1)
+                                   3 (change-element2
+                                      (change-element2 field-data new-pos 0)
+                                      next-pos 'o)))))
                env))
           ((eq? gimmick 'g) (edit env
                                   select (if (= (stage-selecting env) -1)
@@ -826,44 +877,48 @@
           ((eq? gimmick 'k)
            (edit env
                  pos new-pos
-                 stage (edit stage-env
-                             0 (dec-remain-act 1)
-                             1 (+ key-count 1)
-                             3 (change-element2 field-data new-pos 0))))
+                 stage (enemy-move
+                        (edit stage-env
+                              0 (dec-remain-act 1)
+                              1 (+ key-count 1)
+                              3 (change-element2 field-data new-pos 0)))))
           ((eq? gimmick 'L)
            (if (zero? key-count)
                env
                (edit env
                      pos new-pos
-                     stage (recalc-lazer
-                            (edit stage-env
-                                  0 (dec-remain-act 1)
-                                  1 (- key-count 1)
-                                  3 (change-element2 field-data new-pos 'U))))))
+                     stage (enemy-move
+                            (recalc-lazer
+                             (edit stage-env
+                                   0 (dec-remain-act 1)
+                                   1 (- key-count 1)
+                                   3 (change-element2 field-data new-pos 'U)))))))
           ((eq? gimmick 'ju)
            (edit env
                  pos (update-pos (update-pos new-pos "up") "up")
-                 stage (edit stage-env
-                             0 (dec-remain-act 1))))
+                 stage (enemy-move
+                        (edit stage-env
+                              0 (dec-remain-act 1)))))
           ((eq? gimmick 'jd)
            (edit env
                  pos (update-pos (update-pos new-pos "down") "down")
-                 stage (edit stage-env
-                             0 (dec-remain-act 1))))
+                 stage (enemy-move
+                        (edit stage-env
+                              0 (dec-remain-act 1)))))
           ((eq? gimmick 'jr)
            (edit env
                  pos (update-pos (update-pos new-pos "right") "right")
-                 stage (edit stage-env
+                 stage (edit (enemy-move stage-env)
                              0 (dec-remain-act 1))))
           ((eq? gimmick 'jl)
            (edit env
                  pos (update-pos (update-pos new-pos "left") "left")
-                 stage (edit stage-env
+                 stage (edit (enemy-move stage-env)
                              0 (dec-remain-act 1))))
           (else
            (edit env
                  pos new-pos
-                 stage (edit stage-env 0 (dec-remain-act 1))))))
+                 stage (edit (enemy-move stage-env) 0 (dec-remain-act 1))))))
   (define (objects-move env move-object-list n)
     (define stage-env (stage-state-list env))
     (define field-data (cadddr stage-env))
@@ -915,15 +970,95 @@
                             (object-move (car move-object-list) n))
                       (cdr move-object-list)
                       (+ n 1))))
+  (define (enemy-move stage-env)
+    (define enemy-list (take-element stage-env 8))
+    (define (move en el n)
+      (define f-data (take-element en 3))
+      (define e-list (take-element en 8))
+      (if (null? el)
+          en
+          (let* ((enemy (car el))
+                 (e-pos (car enemy))
+                 (move-list (cadddr enemy))
+                 (new-pos
+                  (if (eq? (caddr enemy) 'n)
+                      (if (= (cadr enemy) (- (length move-list) 1))
+                          (take-element move-list (- (cadr enemy) 1))
+                          (take-element move-list (+ (cadr enemy) 1)))
+                      (if (= (cadr enemy) 0)
+                          (take-element move-list 1)
+                          (take-element move-list (- (cadr enemy) 1))))))
+            (move
+             (edit
+              en
+              3 (change-element2
+                 (change-element2
+                  f-data
+                  (if (ormap (lambda (g)
+                               (eq? (take-element2 f-data new-pos) g))
+                             '(w b o))
+                      (if (eq? (caddr enemy) 'n)
+                          (take-element move-list (- (cadr enemy) 1))
+                          (take-element move-list 1))
+                      new-pos)
+                  (take-element2 f-data e-pos))
+                 e-pos '0)
+              8 (change-element2
+                 (change-element2
+                  (change-element2
+                   e-list
+                   `(0 . ,n)
+                   (if (ormap (lambda (g)
+                                (eq? (take-element2 f-data new-pos) g))
+                              '(w b o))
+                       (if (eq? (caddr enemy) 'n)
+                           (take-element move-list (- (cadr enemy) 1))
+                           (take-element move-list 1))
+                       new-pos))
+                  `(1 . ,n)
+                  (if (eq? (caddr enemy) 'n)
+                      (if (or (= (cadr enemy) (- (length move-list) 1))
+                              (ormap (lambda (g)
+                                       (eq? (take-element2 f-data new-pos) g))
+                                     '(w b o)))
+                          (- (cadr enemy) 1)
+                          (+ (cadr enemy) 1))
+                      (if (or (= (cadr enemy) 0)
+                              (ormap (lambda (g)
+                                       (eq? (take-element2 f-data new-pos) g))
+                                     '(w b o)))
+                          1
+                          (- (cadr enemy) 1))))
+                 `(2 . ,n)
+                 (if (eq? (caddr enemy) 'n)
+                     (if (or (= (cadr enemy) (- (length move-list) 1))
+                             (ormap (lambda (g)
+                                      (eq? (take-element2 f-data new-pos) g))
+                                    '(w b o)))
+                         'p
+                         'n)
+                     (if (or (= (cadr enemy) 0)
+                             (ormap (lambda (g)
+                                      (eq? (take-element2 f-data new-pos) g))
+                                    '(w b o)))
+                         'n
+                         'p))))
+             (cdr el)
+             (+ n 1)))))
+    (move stage-env enemy-list 0))
   (define (fail-check env)
     (if (and (= (screen-type env) 2)
              (<= (car (stage-state-list env)) 0))
         (fail-process env 'step)
         env))
+  (define (eaten? env)
+    (define player-pos (player-pos-in-stage env))
+    (define enemy-list (take-element (stage-state-list env) 8))
+    (ormap (lambda (enemy)
+             (pos=? player-pos (car enemy)))
+           enemy-list))
   (define (eaten-check env)
-    (if (eq? (take-element2 (cadddr (stage-state-list env))
-                            (player-pos-in-stage env))
-             'e)
+    (if (eaten? env)
         (fail-process env 'step)
         env))
   (define (burnt-check env)
