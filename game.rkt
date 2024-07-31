@@ -295,15 +295,15 @@
     ((#t (8 . 2) l) (#t (5 . 0) l) (#t (0 . 1) r))
     ()))
 (define map-data-4
-  `(164
+  `(64
     1
     (1 . 1)
     (19 . 11)
     ((0 0 0 b 0 0 0 b 0 0 0 b 0 0 0 b 0 0 0)
      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 (s 0) 0)
-     (0 0 0 b 0 0 0 b 0 o 0 b 0 0 0 b 0 (x -2) 0)
+     (0 0 0 b 0 0 0 b 0 o 0 b 0 0 0 b 0 (x -5) 0)
      (b 0 b b b b b b b 0 b b b b b b b L b)
-     (0 0 0 b k k k b 0 0 0 b 0 0 0 b 0 (x -2) 0)
+     (0 0 0 b k k k b 0 0 0 b 0 0 0 b 0 (x -5) 0)
      (0 (x 5) 0 b 0 (x 5) 0 b 0 b 0 b 0 (x 5) 0 L 0 iu 0)
      (0 0 0 b 0 (s 0) 0 b 0 0 Ir b w 0 0 b 0 0 0)
      (b 0 b b b L b b b 0 b b b L b b b u b)
