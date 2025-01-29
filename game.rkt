@@ -13,7 +13,7 @@
 (define SQUARE 64)
 
 ;;実装済みの最後のステージ
-(define last-stage 5)
+(define last-stage 6)
 
 ;;環境変数周りの定義
 (define WORLD-ENVIROMENT
@@ -574,7 +574,7 @@
                                                                      x1 y3                                                              
                                                                      (place-image (text "stage 5" 64 "black")
                                                                                   x2 y3
-                                                                                  (place-image (text "stage 6" 64 "gray")
+                                                                                  (place-image (text "stage 6" 64 "black")
                                                                                                x3 y3
                                                                                                ;; (place-image (circle 30 "solid" "black")
                                                                                                (place-image (text ">" 100 "black")
@@ -588,7 +588,7 @@
                        ((string=? key "left") (- (stage-selecting env) 1))
                        ((string=? key "up") (- (stage-selecting env) 3))
                        ((string=? key "down") (if (= (stage-selecting env) 0)
-                                                  1
+                                                  2
                                                   (+ (stage-selecting env) 3)))
                        (else (stage-selecting env)))))
     ;ステージ1を選択中左を押されたら6に移動
@@ -809,8 +809,8 @@
                  (cons (+ x 1) y)))))
   (define (rev-dir dir)
     (cond ((string=? dir "up") "down")
-          ((string=? dir "down") "down")
-          ((string=? dir "ledt") "right")
+          ((string=? dir "down") "up")
+          ((string=? dir "left") "right")
           ((string=? dir "right") "left")))
   (define (player-move env)
     (define dir key)
@@ -1067,7 +1067,7 @@
                (take-element (stage-state-list env) 7))
         (fail-process env 'laser)
         env))
-  (cond ((string=? key "p") (edit env screen 3))
+  (cond ((or (string=? key "p") (string=? key "escape")) (edit env screen 3))
         ((string=? key "r") (init-stage env))
         ((dir? key)
          (fail-check
